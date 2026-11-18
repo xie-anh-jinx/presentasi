@@ -7,23 +7,22 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Montserrat:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --bg-outer: #090e1a;
-      --bg-card: #0d1424;
-      --bg-panel: #10192d;
-      --bg-chip: #111c33;
-      --border-main: #233048;
-      --border-subtle: #1e2a42;
-      --border-chip: #33425e;
-      --accent: #34d399;
-      --accent-soft: rgba(52, 211, 153, 0.14);
-      --text-bright: #f8fafc;
-      --text-primary: #cbd5e1;
-      --text-muted: #94a3b8;
-      --text-dim: #64748b;
+      --font: 'Montserrat', sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+      --text-color: #ffffff;
+      --text-muted: #d1d5db;
+      --text-dim: #9ca3af;
+      --glow-yellow: #fffa66;
+      --glow-red: #ff2300;
+      --bg-color: #000000;
+      --border-color: #ff2300;
+      --app-shadow: 0 0 1.8rem rgba(255, 35, 0, 0.55);
+      --panel-shadow: 0 0 1.2rem rgba(255, 35, 0, 0.25);
+      --separator-shadow: 0 0 0.8rem #ffffff;
     }
 
     * {
@@ -33,196 +32,399 @@
     }
 
     html {
+      font-size: 62.5%;
       scroll-behavior: smooth;
     }
 
     body {
-      background-color: var(--bg-outer);
-      background-image:
-        radial-gradient(900px 600px at 15% 0%, rgba(52, 211, 153, 0.05), transparent 60%),
-        radial-gradient(800px 600px at 85% 100%, rgba(59, 130, 246, 0.06), transparent 60%);
-      color: var(--text-primary);
-      font-family: 'JetBrains Mono', monospace;
-      line-height: 1.65;
-      padding: 36px 20px 56px;
       min-height: 100vh;
+      background-image: radial-gradient(
+        circle at 22% 20%,
+        var(--glow-yellow),
+        var(--glow-red) 16%,
+        var(--bg-color) 62%
+      );
+      background-repeat: no-repeat;
+      background-color: var(--bg-color);
+      background-blend-mode: hard-light;
+      background-attachment: fixed;
+      background-size: cover;
+      font-size: 1.4rem;
+      font-family: var(--font);
+      color: var(--text-color);
+      overflow-x: hidden;
     }
 
-    /* ===== Top Nav Bar (subtle, hidden on print) ===== */
+    /* Ambient blur layer matching recommendation */
+    .ambient-backdrop {
+      position: fixed;
+      inset: 0;
+      backdrop-filter: blur(5rem);
+      -webkit-backdrop-filter: blur(5rem);
+      background: radial-gradient(circle at 80% 85%, rgba(255, 35, 0, 0.14), transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ===== Top Bar ===== */
     .top-bar {
-      max-width: 1060px;
-      margin: 0 auto 16px;
+      position: relative;
+      z-index: 5;
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 2rem 2.4rem 0;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 12px;
-      color: var(--text-dim);
+      gap: 1.2rem;
     }
 
-    .top-bar a,
-    .top-bar button {
-      color: var(--text-muted);
-      text-decoration: none;
-      background: rgba(16, 25, 45, 0.85);
-      border: 1px solid var(--border-main);
+    .top-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.8rem 1.8rem;
       border-radius: 999px;
-      padding: 6px 14px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      cursor: pointer;
-      transition: border-color 0.2s, color 0.2s, background 0.2s;
-    }
-
-    .top-bar a:hover,
-    .top-bar button:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-      background: var(--accent-soft);
-    }
-
-    /* ===== Main Resume Container ===== */
-    .resume-frame {
-      max-width: 1060px;
-      margin: 0 auto;
-      background: var(--bg-card);
-      border: 1.5px solid var(--border-main);
-      border-radius: 28px;
-      padding: 52px 54px 56px;
-      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
-    }
-
-    /* ===== Header ===== */
-    .header {
-      display: flex;
-      align-items: center;
-      gap: 34px;
-      margin-bottom: 44px;
-    }
-
-    .avatar-box {
-      width: 132px;
-      height: 132px;
-      flex: none;
-      border-radius: 14px;
-      overflow: hidden;
-      border: 1.5px solid var(--border-chip);
-      background: linear-gradient(145deg, #16223a, #0b1120);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
-
-    .avatar-box img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .avatar-fallback {
-      font-family: 'Inter', sans-serif;
-      font-size: 38px;
-      font-weight: 800;
-      letter-spacing: 0.04em;
-      color: var(--accent);
-      text-shadow: 0 2px 18px rgba(52, 211, 153, 0.25);
-      user-select: none;
-    }
-
-    .identity h1 {
-      font-family: 'Inter', sans-serif;
-      font-size: 40px;
-      font-weight: 800;
-      color: var(--text-bright);
-      letter-spacing: -0.02em;
-      line-height: 1.15;
-    }
-
-    .identity .role {
-      font-family: 'Inter', sans-serif;
-      font-size: 19px;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-top: 4px;
-      margin-bottom: 14px;
-    }
-
-    .contact-list {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-      font-size: 13.5px;
-      color: var(--text-primary);
-    }
-
-    .contact-list a {
-      color: inherit;
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px solid rgba(255, 35, 0, 0.45);
+      color: var(--text-color);
+      font-family: var(--mono);
+      font-size: 1.2rem;
       text-decoration: none;
-      width: fit-content;
-      transition: color 0.2s;
+      cursor: pointer;
+      backdrop-filter: blur(0.8rem);
+      transition: all 0.25s ease;
     }
 
-    .contact-list a:hover {
-      color: var(--accent);
+    .top-btn:hover {
+      border-color: var(--glow-yellow);
+      box-shadow: 0 0 1.2rem rgba(255, 35, 0, 0.6);
+      transform: translateY(-1px);
     }
 
-    /* ===== Grid Layout ===== */
-    .content-grid {
+    /* ===== Main Layout ===== */
+    .app__outer {
+      position: relative;
+      z-index: 2;
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 3.2rem 2.4rem 6rem;
       display: grid;
-      grid-template-columns: 1fr 310px;
-      gap: 44px;
+      grid-template-columns: 38rem 1fr;
+      gap: 3.6rem;
       align-items: start;
     }
 
-    /* ===== Section Headings ===== */
-    .cmd-heading {
-      font-size: 19px;
+    /* ===== Left Character Card (.app) ===== */
+    .app {
+      position: sticky;
+      top: 2.8rem;
+      display: flex;
+      width: 100%;
+      flex-direction: column;
+      background-image: linear-gradient(180deg, rgba(255, 35, 0, 0.14), rgba(0, 0, 0, 0.92) 55%);
+      background-color: rgba(8, 8, 12, 0.85);
+      border-radius: 4.2rem;
+      border: 1.5px solid rgba(255, 35, 0, 0.45);
+      backdrop-filter: blur(0.6rem);
+      -webkit-backdrop-filter: blur(0.6rem);
+      box-shadow: var(--app-shadow);
+      padding-bottom: 2.8rem;
+    }
+
+    .app__header {
+      display: flex;
+      width: 100%;
+      height: 5.2rem;
+      padding: 0 3.2rem;
+      align-items: center;
+      border-bottom: 0.2rem solid rgba(255, 35, 0, 0.65);
+    }
+
+    .header__title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+    }
+
+    .header__title:last-of-type {
+      color: var(--text-color);
+      text-decoration: underline;
+      text-decoration-color: var(--glow-red);
+      text-underline-offset: 0.4rem;
+    }
+
+    .header__icon {
+      display: flex;
+      width: 1.6rem;
+      height: 1.6rem;
+      margin: 0 0.8rem;
+      color: var(--glow-red);
+    }
+
+    .app__content {
+      display: flex;
+      width: 100%;
+      padding: 0 2.8rem;
+      flex-direction: column;
+    }
+
+    .app__nft {
+      display: flex;
+      width: 100%;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 2.4rem;
+    }
+
+    .nft__img {
+      display: flex;
+      width: 22rem;
+      height: 22rem;
+      justify-content: center;
+      align-items: center;
+      will-change: transform;
+      transform-style: preserve-3d;
+      animation: 5s nft-float ease-in-out alternate infinite;
+    }
+
+    .nft__img .img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 2.8rem;
+      border: 2px solid rgba(255, 250, 102, 0.45);
+      box-shadow:
+        0 1.4rem 3.2rem rgba(0, 0, 0, 0.85),
+        0 0 2.4rem rgba(255, 35, 0, 0.55);
+    }
+
+    .nft__title {
+      margin-top: 2.2rem;
+      font-size: 3.1rem;
       font-weight: 700;
-      color: var(--text-bright);
-      margin-bottom: 18px;
+      text-align: center;
+      letter-spacing: -0.02em;
+      text-shadow: 0 0 1.6rem rgba(255, 35, 0, 0.55);
+    }
+
+    .nft__role {
+      margin-top: 0.4rem;
+      font-size: 1.35rem;
+      font-weight: 500;
+      color: var(--glow-yellow);
+      text-align: center;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .nft__title-separator {
+      position: relative;
+      width: 100%;
+      height: 2rem;
+      margin-top: 1.8rem;
+      overflow: hidden;
+    }
+
+    .nft__title-separator::after {
+      content: " ";
+      display: flex;
+      width: 100%;
+      height: 2.5rem;
+      margin: -2.5rem auto 0;
+      border-radius: 12.5rem / 1.2rem;
+      box-shadow: var(--separator-shadow);
+    }
+
+    .nft__progression {
+      display: flex;
+      width: 100%;
+      padding: 1.8rem 2rem;
+      flex-direction: column;
+      background-color: rgba(0, 0, 0, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 2.4rem;
+    }
+
+    .progression-current-lvl__subtitle {
+      margin-bottom: 0.8rem;
+      font-size: 1.8rem;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .lvl-badge {
+      font-family: var(--mono);
+      font-size: 1.15rem;
+      padding: 0.25rem 0.9rem;
+      border-radius: 999px;
+      background: rgba(255, 35, 0, 0.25);
+      border: 1px solid var(--glow-red);
+      color: var(--glow-yellow);
+    }
+
+    .progression-next-lvl__subtitle {
+      margin-bottom: 0.4rem;
+      font-size: 1.25rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .progression-xp__subtitle {
+      font-family: var(--mono);
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--glow-yellow);
+      margin-bottom: 1rem;
+    }
+
+    .progression__bar {
+      width: 100%;
+      height: 0.9rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .progression__fill {
+      width: 92%;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--glow-red), var(--glow-yellow));
+      box-shadow: 0 0 1.2rem var(--glow-red);
+      animation: xp-pulse 2.6s ease-in-out infinite alternate;
+    }
+
+    .contact-stack {
+      width: 100%;
+      margin-top: 1.6rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+
+    .contact-pill {
       display: flex;
       align-items: center;
-      gap: 10px;
-      letter-spacing: -0.01em;
+      justify-content: center;
+      gap: 0.8rem;
+      padding: 1rem 1.4rem;
+      border-radius: 1.6rem;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text-color);
+      font-family: var(--mono);
+      font-size: 1.25rem;
+      text-decoration: none;
+      transition: all 0.25s ease;
     }
 
-    .cmd-heading .prompt {
-      color: var(--accent);
+    .contact-pill:hover {
+      border-color: var(--glow-red);
+      box-shadow: 0 0 1.2rem rgba(255, 35, 0, 0.45);
+      color: var(--glow-yellow);
+    }
+
+    /* ===== Right Panels (Quest Log, Skills, Origin) ===== */
+    .panels-col {
+      display: flex;
+      flex-direction: column;
+      gap: 2.6rem;
+    }
+
+    .panel-card {
+      background: rgba(8, 8, 12, 0.78);
+      border: 1px solid rgba(255, 35, 0, 0.35);
+      border-radius: 3rem;
+      padding: 2.8rem 3.2rem;
+      backdrop-filter: blur(0.8rem);
+      -webkit-backdrop-filter: blur(0.8rem);
+      box-shadow: var(--panel-shadow);
+    }
+
+    .panel-heading {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-family: var(--mono);
+      font-size: 1.85rem;
       font-weight: 700;
+      color: var(--text-color);
+      margin-bottom: 1.8rem;
+      padding-bottom: 1.2rem;
+      border-bottom: 1px solid rgba(255, 35, 0, 0.35);
     }
 
-    /* ===== About Me ===== */
-    .about-section {
-      margin-bottom: 42px;
+    .panel-heading .prompt {
+      color: var(--glow-red);
+      text-shadow: 0 0 0.8rem var(--glow-red);
     }
 
     .about-text {
-      font-size: 13.2px;
-      line-height: 1.78;
+      font-size: 1.42rem;
+      line-height: 1.8;
       color: var(--text-muted);
-      text-align: justify;
+      font-weight: 400;
     }
 
-    /* ===== Experience Log & Timeline ===== */
+    /* ===== Skills Grid ===== */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.2rem;
+    }
+
+    .skill-chip {
+      padding: 1.2rem 1.6rem;
+      border-radius: 1.6rem;
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      font-family: var(--mono);
+      font-size: 1.25rem;
+      font-weight: 500;
+      color: var(--text-color);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: all 0.25s ease;
+    }
+
+    .skill-chip::before {
+      content: "◆";
+      color: var(--glow-red);
+      font-size: 1.1rem;
+      text-shadow: 0 0 0.6rem var(--glow-red);
+    }
+
+    .skill-chip:hover {
+      border-color: var(--glow-yellow);
+      box-shadow: 0 0 1.4rem rgba(255, 35, 0, 0.45);
+      transform: translateY(-2px);
+    }
+
+    /* ===== Experience Timeline ===== */
     .timeline {
       position: relative;
-      padding-left: 28px;
+      padding-left: 2.6rem;
     }
 
     .timeline::before {
       content: "";
       position: absolute;
-      left: 5px;
-      top: 10px;
-      bottom: 12px;
-      width: 1.5px;
-      background: var(--border-main);
+      left: 0.6rem;
+      top: 0.8rem;
+      bottom: 1rem;
+      width: 2px;
+      background: linear-gradient(180deg, var(--glow-yellow), var(--glow-red), rgba(255, 35, 0, 0.15));
     }
 
     .exp-item {
       position: relative;
-      margin-bottom: 34px;
+      margin-bottom: 3rem;
     }
 
     .exp-item:last-child {
@@ -231,322 +433,344 @@
 
     .exp-node {
       position: absolute;
-      left: -28px;
-      top: 5px;
-      width: 12px;
-      height: 12px;
+      left: -2.6rem;
+      top: 0.45rem;
+      width: 1.4rem;
+      height: 1.4rem;
       border-radius: 50%;
-      border: 2.5px solid var(--accent);
-      background: var(--bg-card);
-      box-shadow: 0 0 0 4px var(--bg-card);
+      background: var(--bg-color);
+      border: 2.5px solid var(--glow-yellow);
+      box-shadow: 0 0 1rem var(--glow-red);
     }
 
     .exp-header {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      gap: 16px;
+      gap: 1.2rem;
       flex-wrap: wrap;
-      margin-bottom: 14px;
+      margin-bottom: 1rem;
     }
 
     .exp-title {
-      font-size: 15px;
+      font-size: 1.65rem;
       font-weight: 700;
-      color: var(--text-bright);
+      color: var(--text-color);
     }
 
     .exp-title .company {
-      color: var(--text-primary);
+      color: var(--glow-yellow);
       font-weight: 500;
     }
 
     .exp-period {
-      font-size: 12.5px;
+      font-family: var(--mono);
+      font-size: 1.2rem;
       font-weight: 600;
-      color: var(--text-primary);
-      letter-spacing: 0.04em;
+      padding: 0.3rem 1rem;
+      border-radius: 999px;
+      background: rgba(255, 35, 0, 0.18);
+      border: 1px solid rgba(255, 35, 0, 0.45);
+      color: var(--text-color);
       white-space: nowrap;
     }
 
     .exp-intro {
-      font-size: 12.8px;
+      font-size: 1.35rem;
+      line-height: 1.7;
       color: var(--text-muted);
-      line-height: 1.72;
-      margin-bottom: 16px;
+      margin-bottom: 1.4rem;
     }
 
     .exp-subhead {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin: 18px 0 10px;
+      font-family: var(--mono);
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--glow-yellow);
+      margin: 1.8rem 0 0.9rem;
+      letter-spacing: 0.02em;
     }
 
     .bullet-list {
       list-style: none;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 0.8rem;
     }
 
     .bullet-list li {
       position: relative;
-      padding-left: 18px;
-      font-size: 12.6px;
+      padding-left: 1.8rem;
+      font-size: 1.34rem;
       line-height: 1.65;
       color: var(--text-muted);
     }
 
     .bullet-list li::before {
-      content: "◦";
+      content: "▸";
       position: absolute;
       left: 0;
       top: 0;
-      color: var(--text-dim);
-      font-weight: 700;
+      color: var(--glow-red);
     }
 
     .bullet-list li strong {
-      color: var(--text-primary);
+      color: var(--text-color);
       font-weight: 600;
     }
 
-    /* ===== Sidebar Cards ===== */
-    .sidebar {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-    }
-
-    .side-card {
-      background: var(--bg-panel);
-      border: 1px solid var(--border-main);
-      border-radius: 14px;
-      padding: 22px 22px 24px;
-    }
-
-    .side-title {
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--text-bright);
-      padding-bottom: 12px;
-      margin-bottom: 18px;
-      border-bottom: 1px solid var(--border-main);
-    }
-
-    .skill-stack {
-      display: flex;
-      flex-direction: column;
-      gap: 11px;
-    }
-
-    .skill-item {
-      border: 1px solid var(--border-chip);
-      background: var(--bg-chip);
-      border-radius: 6px;
-      padding: 10px 14px;
-      text-align: center;
-      font-size: 12.5px;
-      font-weight: 500;
-      color: var(--text-primary);
-      line-height: 1.45;
-      transition: border-color 0.2s, transform 0.2s;
-    }
-
-    .skill-item:hover {
-      border-color: var(--accent);
-      transform: translateY(-1px);
+    /* ===== Bottom 2-Col Meta (Education & Languages) ===== */
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2.6rem;
     }
 
     .edu-school {
-      font-family: 'Inter', sans-serif;
-      font-size: 15.5px;
+      font-size: 1.65rem;
       font-weight: 700;
-      color: var(--text-bright);
-      margin-bottom: 4px;
+      color: var(--text-color);
+      margin-bottom: 0.4rem;
     }
 
     .edu-detail {
-      font-size: 13px;
+      font-family: var(--mono);
+      font-size: 1.3rem;
       color: var(--text-muted);
-      line-height: 1.6;
+      line-height: 1.7;
     }
 
     .lang-list {
       list-style: none;
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      font-size: 13.5px;
+      gap: 0.8rem;
+      font-family: var(--mono);
+      font-size: 1.35rem;
       color: var(--text-muted);
     }
 
+    .lang-list li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.8rem 1.2rem;
+      border-radius: 1.2rem;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .lang-tag {
+      font-size: 1.15rem;
+      color: var(--glow-yellow);
+    }
+
+    /* ===== Animations ===== */
+    @keyframes nft-float {
+      0% { transform: translate3d(0, 0, 0); }
+      50% { transform: translate3d(0, -1.4rem, 0); }
+      100% { transform: translate3d(0, 0, 0); }
+    }
+
+    @keyframes xp-pulse {
+      0% { filter: brightness(0.95); }
+      100% { filter: brightness(1.2); }
+    }
+
     /* ===== Responsive ===== */
-    @media (max-width: 920px) {
-      .resume-frame {
-        padding: 36px 28px;
-        border-radius: 20px;
-      }
-      .content-grid {
+    @media (max-width: 980px) {
+      .app__outer {
         grid-template-columns: 1fr;
-        gap: 36px;
+        gap: 2.8rem;
+      }
+      .app {
+        position: static;
+        max-width: 44rem;
+        margin: 0 auto;
       }
     }
 
-    @media (max-width: 560px) {
-      body {
-        padding: 16px 12px 36px;
+    @media (max-width: 640px) {
+      .skills-grid,
+      .meta-grid {
+        grid-template-columns: 1fr;
       }
-      .resume-frame {
-        padding: 26px 20px;
+      .panel-card {
+        padding: 2.2rem 2rem;
+        border-radius: 2.4rem;
       }
-      .header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 20px;
-      }
-      .identity h1 {
-        font-size: 30px;
-      }
-      .about-text {
-        text-align: left;
+      .app {
+        border-radius: 3.2rem;
       }
     }
 
-    /* ===== Print ===== */
     @media print {
       body {
-        background: #0d1424;
-        padding: 0;
+        background: #0b0b0f;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
       }
+      .ambient-backdrop,
       .top-bar {
         display: none;
       }
-      .resume-frame {
-        border: none;
+      .app__outer {
+        grid-template-columns: 30rem 1fr;
+        padding: 1rem;
+        gap: 2rem;
+      }
+      .app {
+        position: static;
         box-shadow: none;
-        padding: 24px 28px;
-        max-width: 100%;
+      }
+      .nft__img {
+        animation: none;
       }
     }
   </style>
 </head>
 <body>
 
+  <div class="ambient-backdrop" aria-hidden="true"></div>
+
   <div class="top-bar">
-    <a href="index.html">← Kembali ke Presentasi</a>
-    <button type="button" onclick="window.print()">Cetak / Simpan PDF</button>
+    <a class="top-btn" href="index.html">← Kembali ke Presentasi</a>
+    <button class="top-btn" type="button" onclick="window.print()">Cetak / Simpan PDF</button>
   </div>
 
-  <main class="resume-frame">
-    <!-- ===== Header ===== -->
-    <header class="header">
-      <div class="avatar-box">
-        <img src="profile.jpg" alt="Eko Wahyudi">
-      </div>
-      <div class="identity">
-        <h1>Eko Wahyudi</h1>
-        <div class="role">IT Officer/Fullstack Developer</div>
-        <div class="contact-list">
-          <a href="tel:+6281242818143">0812-4281-8143</a>
-          <a href="mailto:we.wahyudieko@gmail.com">we.wahyudieko@gmail.com</a>
+  <div class="app__outer">
+    <!-- ===== Character Card (.app) ===== -->
+    <aside class="app">
+      <header class="app__header">
+        <h3 class="header__title">Developer Profile</h3>
+        <svg xmlns="http://www.w3.org/2000/svg" class="header__icon" viewBox="0 0 512 512" aria-hidden="true">
+          <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="48" d="M184 112l144 144-144 144"/>
+        </svg>
+        <h3 class="header__title">Eko Wahyudi</h3>
+      </header>
+
+      <div class="app__content">
+        <div class="app__nft">
+          <div class="nft__img">
+            <img class="img" src="profile.jpg" alt="Eko Wahyudi" />
+          </div>
+
+          <h1 class="nft__title">Eko Wahyudi</h1>
+          <div class="nft__role">IT Officer / Fullstack Developer</div>
+
+          <div class="nft__title-separator" aria-hidden="true"></div>
+
+          <div class="nft__progression">
+            <h4 class="progression-current-lvl__subtitle">
+              <span>Current LvL: 10+</span>
+              <span class="lvl-badge">SENIOR</span>
+            </h4>
+            <h4 class="progression-next-lvl__subtitle">
+              Class: Fullstack · AI · Web3 · Infra
+            </h4>
+            <h4 class="progression-xp__subtitle">
+              XP: 8+ Yrs Corporate / 10+ Yrs Freelance
+            </h4>
+            <div class="progression__bar" aria-label="Experience progression">
+              <div class="progression__fill"></div>
+            </div>
+          </div>
+
+          <div class="contact-stack">
+            <a class="contact-pill" href="tel:+6281242818143">0812-4281-8143</a>
+            <a class="contact-pill" href="mailto:we.wahyudieko@gmail.com">we.wahyudieko@gmail.com</a>
+          </div>
         </div>
       </div>
-    </header>
+    </aside>
 
-    <!-- ===== Two-Column Content ===== -->
-    <div class="content-grid">
-      <!-- Left Column -->
-      <div class="main-col">
-        <section class="about-section">
-          <h2 class="cmd-heading"><span class="prompt">&gt;_</span> About_Me</h2>
-          <p class="about-text">
-            Profesional Teknologi Informasi dengan pengalaman lebih dari 8 tahun sebagai IT Officer serta lebih dari 10 tahun sebagai freelance Web Designer dan Software Developer. Berpengalaman mengembangkan aplikasi web, sistem informasi akademik, serta solusi berbasis Artificial Intelligence (AI) dan Blockchain/Web3. Memiliki keahlian dalam pengembangan full-stack, perancangan arsitektur sistem, integrasi API, dan pengelolaan infrastruktur TI. Berorientasi pada penyelesaian masalah melalui solusi yang aman, skalabel, dan inovatif.
-          </p>
-        </section>
+    <!-- ===== Right Content Panels ===== -->
+    <main class="panels-col">
+      <!-- About Me -->
+      <section class="panel-card">
+        <h2 class="panel-heading"><span class="prompt">&gt;_</span> About_Me</h2>
+        <p class="about-text">
+          Profesional Teknologi Informasi dengan pengalaman lebih dari 8 tahun sebagai IT Officer serta lebih dari 10 tahun sebagai freelance Web Designer dan Software Developer. Berpengalaman mengembangkan aplikasi web, sistem informasi akademik, serta solusi berbasis Artificial Intelligence (AI) dan Blockchain/Web3. Memiliki keahlian dalam pengembangan full-stack, perancangan arsitektur sistem, integrasi API, dan pengelolaan infrastruktur TI. Berorientasi pada penyelesaian masalah melalui solusi yang aman, skalabel, dan inovatif.
+        </p>
+      </section>
 
-        <section class="experience-section">
-          <h2 class="cmd-heading"><span class="prompt">&gt;_</span> ~/experience_log</h2>
+      <!-- Skills -->
+      <section class="panel-card">
+        <h2 class="panel-heading"><span class="prompt">&gt;_</span> ~/Skill</h2>
+        <div class="skills-grid">
+          <div class="skill-chip">Programming &amp; Web Development</div>
+          <div class="skill-chip">Artificial Intelligence</div>
+          <div class="skill-chip">Blockchain &amp; Web3</div>
+          <div class="skill-chip">IT Infrastructure</div>
+          <div class="skill-chip">Community Building &amp; Developer Relations</div>
+          <div class="skill-chip">Technology Evangelism &amp; Technical Presentation</div>
+        </div>
+      </section>
 
-          <div class="timeline">
-            <!-- Experience 1 -->
-            <article class="exp-item">
-              <span class="exp-node" aria-hidden="true"></span>
-              <div class="exp-header">
-                <div class="exp-title">IT Officer <span class="company">| PT Cahaya Pengajaran Abadi</span></div>
-                <div class="exp-period">2018 – PRESENT</div>
-              </div>
-              <ul class="bullet-list">
-                <li>Mengelola infrastruktur teknologi informasi perusahaan, termasuk server, jaringan, perangkat keras, dan sistem keamanan.</li>
-                <li>Mengembangkan serta memelihara aplikasi dan sistem internal untuk mendukung operasional perusahaan.</li>
-                <li>Merancang, mengembangkan, dan memelihara website perusahaan serta melakukan integrasi dengan layanan pihak ketiga melalui API.</li>
-                <li>Memberikan dukungan teknis kepada pengguna, melakukan pemeliharaan sistem, serta memastikan ketersediaan layanan TI.</li>
-                <li>Berkolaborasi dengan berbagai divisi untuk mengembangkan solusi digital yang meningkatkan efisiensi proses bisnis.</li>
-              </ul>
-            </article>
+      <!-- Experience Log -->
+      <section class="panel-card">
+        <h2 class="panel-heading"><span class="prompt">&gt;_</span> ~/experience_log</h2>
+        <div class="timeline">
+          <article class="exp-item">
+            <span class="exp-node" aria-hidden="true"></span>
+            <div class="exp-header">
+              <div class="exp-title">IT Officer <span class="company">| PT Cahaya Pengajaran Abadi</span></div>
+              <span class="exp-period">2018 – PRESENT</span>
+            </div>
+            <ul class="bullet-list">
+              <li>Mengelola infrastruktur teknologi informasi perusahaan, termasuk server, jaringan, perangkat keras, dan sistem keamanan.</li>
+              <li>Mengembangkan serta memelihara aplikasi dan sistem internal untuk mendukung operasional perusahaan.</li>
+              <li>Merancang, mengembangkan, dan memelihara website perusahaan serta melakukan integrasi dengan layanan pihak ketiga melalui API.</li>
+              <li>Memberikan dukungan teknis kepada pengguna, melakukan pemeliharaan sistem, serta memastikan ketersediaan layanan TI.</li>
+              <li>Berkolaborasi dengan berbagai divisi untuk mengembangkan solusi digital yang meningkatkan efisiensi proses bisnis.</li>
+            </ul>
+          </article>
 
-            <!-- Experience 2 -->
-            <article class="exp-item">
-              <span class="exp-node" aria-hidden="true"></span>
-              <div class="exp-header">
-                <div class="exp-title">Freelancer</div>
-                <div class="exp-period">2014 – PRESENT</div>
-              </div>
-              <p class="exp-intro">
-                Menyediakan layanan pengembangan aplikasi web, desain website, solusi Artificial Intelligence (AI), Blockchain/Web3, serta konsultasi transformasi digital bagi perusahaan, institusi pendidikan, UMKM, dan komunitas.
-              </p>
+          <article class="exp-item">
+            <span class="exp-node" aria-hidden="true"></span>
+            <div class="exp-header">
+              <div class="exp-title">Freelancer</div>
+              <span class="exp-period">2014 – PRESENT</span>
+            </div>
+            <p class="exp-intro">
+              Menyediakan layanan pengembangan aplikasi web, desain website, solusi Artificial Intelligence (AI), Blockchain/Web3, serta konsultasi transformasi digital bagi perusahaan, institusi pendidikan, UMKM, dan komunitas.
+            </p>
 
-              <div class="exp-subhead">Proyek AI &amp; Academic Technology</div>
-              <ul class="bullet-list">
-                <li><strong>Academic Intelligence Management System (AIMS)</strong> — Platform pemantauan akademik berbasis AI untuk Fakultas Ilmu Budaya, Universitas Hasanuddin.</li>
-                <li><strong>Cultural Nodes AI</strong> — Platform AI untuk mendukung kolaborasi, pembelajaran, dan pengelolaan pengetahuan komunitas akademik.</li>
-                <li><strong>AIDA (Artificial Intelligence Data Analytic)</strong></li>
-              </ul>
+            <div class="exp-subhead">Proyek AI &amp; Academic Technology</div>
+            <ul class="bullet-list">
+              <li><strong>Academic Intelligence Management System (AIMS)</strong> — Platform pemantauan akademik berbasis AI untuk Fakultas Ilmu Budaya, Universitas Hasanuddin.</li>
+              <li><strong>Cultural Nodes AI</strong> — Platform AI untuk mendukung kolaborasi, pembelajaran, dan pengelolaan pengetahuan komunitas akademik.</li>
+              <li><strong>AIDA (Artificial Intelligence Data Analytic)</strong></li>
+            </ul>
 
-              <div class="exp-subhead">Proyek Blockchain &amp; Web3</div>
-              <ul class="bullet-list">
-                <li><strong>Web3Radio</strong> — Platform radio terdesentralisasi berbasis Web3.</li>
-                <li><strong>Terminus Protocol</strong> — Sistem Proof of Attendance dan Proof of Presence berbasis blockchain.</li>
-                <li><strong>History Makers</strong> — Marketplace untuk tokenisasi Real-World Assets (RWA).</li>
-                <li><strong>FarmDAO</strong> — Platform tokenisasi aset pertanian dan kolaborasi berbasis DAO.</li>
-                <li><strong>Sched3</strong> — Aplikasi penjadwalan terdesentralisasi.</li>
-              </ul>
+            <div class="exp-subhead">Proyek Blockchain &amp; Web3</div>
+            <ul class="bullet-list">
+              <li><strong>Web3Radio</strong> — Platform radio terdesentralisasi berbasis Web3.</li>
+              <li><strong>Terminus Protocol</strong> — Sistem Proof of Attendance dan Proof of Presence berbasis blockchain.</li>
+              <li><strong>History Makers</strong> — Marketplace untuk tokenisasi Real-World Assets (RWA).</li>
+              <li><strong>FarmDAO</strong> — Platform tokenisasi aset pertanian dan kolaborasi berbasis DAO.</li>
+              <li><strong>Sched3</strong> — Aplikasi penjadwalan terdesentralisasi.</li>
+            </ul>
 
-              <div class="exp-subhead">Selected Web &amp; Enterprise Projects</div>
-              <ul class="bullet-list">
-                <li>Website perusahaan untuk PT Cahaya Pengajaran Abadi, AFF Advisory, PT CRA, PT CAL, Global Mitra Kencana, Adhere.id, GIC Indonesia, ITC Indonesia, dan berbagai organisasi lainnya.</li>
-                <li>Pengembangan aplikasi Inventory Management dan Asset Management berbasis web.</li>
-                <li>Website institusi pendidikan, UMKM, media, komunitas, serta organisasi non-profit.</li>
-              </ul>
+            <div class="exp-subhead">Selected Web &amp; Enterprise Projects</div>
+            <ul class="bullet-list">
+              <li>Website perusahaan untuk PT Cahaya Pengajaran Abadi, AFF Advisory, PT CRA, PT CAL, Global Mitra Kencana, Adhere.id, GIC Indonesia, ITC Indonesia, dan berbagai organisasi lainnya.</li>
+              <li>Pengembangan aplikasi Inventory Management dan Asset Management berbasis web.</li>
+              <li>Website institusi pendidikan, UMKM, media, komunitas, serta organisasi non-profit.</li>
+            </ul>
 
-              <div class="exp-subhead">Creative &amp; Digital Project Management</div>
-              <ul class="bullet-list">
-                <li>Mengelola pengembangan platform digital dan media untuk Mekaway Studio &amp; Production House, Kawan Pencerita, Erza Indriyani, Erwin Sulaiman serta DiRumahja Podcast.</li>
-              </ul>
-            </article>
-          </div>
-        </section>
-      </div>
+            <div class="exp-subhead">Creative &amp; Digital Project Management</div>
+            <ul class="bullet-list">
+              <li>Mengelola pengembangan platform digital dan media untuk Mekaway Studio &amp; Production House, Kawan Pencerita, Erza Indriyani, Erwin Sulaiman serta DiRumahja Podcast.</li>
+            </ul>
+          </article>
+        </div>
+      </section>
 
-      <!-- Right Sidebar -->
-      <aside class="sidebar">
-        <section class="side-card">
-          <h3 class="side-title">~/Skill</h3>
-          <div class="skill-stack">
-            <div class="skill-item">Programming &amp; Web Development</div>
-            <div class="skill-item">Artificial Intelligence</div>
-            <div class="skill-item">Blockchain &amp; Web3</div>
-            <div class="skill-item">IT Infrastructure</div>
-            <div class="skill-item">Community Building &amp; Developer Relations</div>
-            <div class="skill-item">Technology Evangelism &amp; Technical Presentation</div>
-          </div>
-        </section>
-
-        <section class="side-card">
-          <h3 class="side-title">~/education_history</h3>
+      <!-- Education & Language -->
+      <div class="meta-grid">
+        <section class="panel-card">
+          <h2 class="panel-heading"><span class="prompt">&gt;_</span> ~/education_history</h2>
           <div class="edu-school">Universitas Hasanuddin</div>
           <div class="edu-detail">
             French Literature<br>
@@ -554,16 +778,16 @@
           </div>
         </section>
 
-        <section class="side-card">
-          <h3 class="side-title">~/language_options</h3>
+        <section class="panel-card">
+          <h2 class="panel-heading"><span class="prompt">&gt;_</span> ~/language_options</h2>
           <ul class="lang-list">
-            <li>English (Fluent)</li>
-            <li>French (Basic)</li>
+            <li><span>English</span><span class="lang-tag">Fluent</span></li>
+            <li><span>French</span><span class="lang-tag">Basic</span></li>
           </ul>
         </section>
-      </aside>
-    </div>
-  </main>
+      </div>
+    </main>
+  </div>
 
 </body>
 </html>
