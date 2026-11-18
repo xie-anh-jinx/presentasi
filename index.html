@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Landasan &amp; Kerangka Berpikir Ilmiah</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
+        "gsap": "https://cdn.jsdelivr.net/npm/gsap@3.12.5/index.js"
+      }
+    }
+  </script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body { height: 100%; }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: #070a12;
+      overflow: hidden;
+    }
+
+    /* ===== Panggung 1280x720 yang di-scale (seperti PowerPoint) ===== */
+    #viewport {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-bottom: 72px;
+    }
+    #viewport.fs { padding-bottom: 0; }
+
+    #stage {
+      position: relative;
+      flex: none;
+      width: 1280px;
+      height: 720px;
+      background:
+        radial-gradient(900px 500px at 85% -10%, rgba(59,130,246,.16), transparent 60%),
+        radial-gradient(700px 450px at -10% 110%, rgba(139,92,246,.14), transparent 60%),
+        #111827;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 30px 60px -15px rgba(0,0,0,.9), 0 0 0 1px rgba(255,255,255,.06);
+      color: #e5e7eb;
+    }
+    #viewport.fs #stage { border-radius: 0; box-shadow: none; }
+
+    /* ===== Slide ===== */
+    .slide {
+      position: absolute;
+      inset: 0;
+      padding: 56px 84px 84px;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(70px);
+      transition: opacity .5s ease, transform .5s cubic-bezier(.4,0,.2,1), visibility 0s .5s;
+    }
+    .slide.active {
+      opacity: 1;
+      visibility: visible;
+      transform: none;
+      transition-delay: 0s;
+    }
+    .slide.past { transform: translateX(-70px); }
+
+    /* Animasi elemen bertahap (diberi --i oleh JS) */
+    .fx { opacity: 0; }
+    .slide.active .fx {
+      animation: rise .65s cubic-bezier(.2,.8,.2,1) both;
+      animation-delay: calc(var(--i, 0) * 120ms + 180ms);
+    }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    /* ===== Background Singularity untuk Slide 1 (BAB I · PENDAHULUAN) ===== */
+    .bh-slide {
+      background-color: #010103;
+    }
+    #bh-canvas-wrap {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+    }
+    #bh-canvas-wrap canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    #bh-vignette {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle, rgba(1, 1, 3, 0.25) 20%, rgba(1, 1, 3, 0.72) 75%, #010103 130%);
+      pointer-events: none;
+      z-index: 1;
+    }
+    #bh-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 36px 84px 54px;
+      background: radial-gradient(circle at center, rgba(1, 1, 3, 0.35) 0%, transparent 45%, rgba(0, 0, 0, 0.55) 100%);
+      z-index: 2;
+    }
+    .bh-header {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .bh-status-pill {
+      display: inline-block;
+      padding: 6px 22px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 30px;
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: #e5e7eb;
+      transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(6px);
+    }
+    .bh-hud-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      opacity: 0.7;
+      letter-spacing: 1px;
+      color: #d1d5db;
+    }
+    .bh-metric { margin-bottom: 5px; }
+    .bh-val {
+      color: #00f3ff;
+      font-weight: 700;
+      transition: color 1.5s ease;
+    }
+    .bh-slide .center {
+      position: relative;
+      z-index: 3;
+      pointer-events: none;
+    }
+    .bh-slide h1 {
+      filter: drop-shadow(0 6px 28px rgba(0, 0, 0, 0.95));
+    }
+    .bh-slide .subtitle {
+      color: #d1d5db;
+      text-shadow: 0 2px 16px rgba(0, 0, 0, 0.95);
+    }
+
+    /* ===== Tipografi ===== */
+    h1 {
+      font-size: 64px;
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -.02em;
+      background: linear-gradient(135deg, #f9fafb, #9ca3af);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    h2 {
+      font-size: 46px;
+      font-weight: 700;
+      letter-spacing: -.01em;
+      color: #f3f4f6;
+      border-left: 7px solid #3b82f6;
+      padding-left: 24px;
+      margin-bottom: 28px;
+      line-height: 1.15;
+    }
+    h4 { font-size: 26px; font-weight: 600; color: #f3f4f6; margin-bottom: 12px; }
+
+    p, li { font-size: 25px; line-height: 1.55; color: #9ca3af; }
+    .lead { font-size: 27px; margin-bottom: 12px; }
+    .hl { color: #60a5fa; font-weight: 600; }
+    .strong { color: #f3f4f6; font-weight: 600; }
+    .small { font-size: 21px; color: #9ca3af; margin-top: 8px; }
+    .sub { font-size: 24px; color: #9ca3af; font-weight: 400; }
+    .big { font-size: 44px !important; color: #f3f4f6 !important; margin: 6px 0 10px; line-height: 1.2; }
+    .statement { font-size: 30px; color: #f3f4f6; line-height: 1.6; }
+    .claim { font-size: 32px; font-style: italic; color: #fca5a5; }
+    .question { font-size: 32px; font-weight: 600; color: #f3f4f6; }
+    .red-text { color: #fca5a5; font-size: 30px; }
+    .amber-text { color: #fcd34d; font-size: 28px; }
+    em { font-style: italic; }
+
+    .tag {
+      align-self: flex-start;
+      background: #1e3a8a;
+      color: #93c5fd;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: .06em;
+      padding: 6px 18px;
+      border-radius: 999px;
+      margin-bottom: 18px;
+      text-transform: uppercase;
+    }
+
+    .mt   { margin-top: 28px; }
+    .mt-s { margin-top: 14px; }
+
+    /* ===== Slide judul / penutup ===== */
+    .title-slide { padding-bottom: 56px; }
+    .center {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .center .tag { align-self: center; }
+    .subtitle { font-size: 28px; color: #9ca3af; max-width: 900px; }
+    .divider { width: 90px; height: 5px; background: #3b82f6; border-radius: 999px; margin: 28px 0; }
+    .closing {
+      font-size: 36px;
+      font-style: italic;
+      font-weight: 300;
+      color: #e5e7eb;
+      line-height: 1.5;
+      max-width: 1000px;
+    }
+
+    /* ===== Kartu ===== */
+    .card {
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 22px;
+      padding: 28px 34px;
+    }
+    .card.blue  { border-color: #3b82f6; }
+    .card.red   { border-color: #ef4444; }
+    .card.amber { border-color: #f59e0b; }
+    .card.gray  { border-color: #6b7280; }
+
+    .cols-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+    .cols-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .stack  { display: flex; flex-direction: column; gap: 20px; }
+    .stack .card p { font-size: 29px; color: #fca5a5; }
+
+    .pillar { padding: 32px 30px; min-height: 270px; }
+    .pillar .label {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #60a5fa;
+      margin-bottom: 14px;
+    }
+    .pillar .q { font-size: 30px; font-weight: 600; color: #f3f4f6; line-height: 1.3; }
+
+    /* ===== Chip ===== */
+    .chips { display: flex; flex-wrap: wrap; gap: 14px; margin: 10px 0; }
+    .chip {
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 999px;
+      padding: 12px 28px;
+      font-size: 24px;
+      font-weight: 500;
+      color: #e5e7eb;
+    }
+
+    /* ===== Alur horizontal ===== */
+    .steps { display: grid; gap: 32px 52px; grid-template-columns: repeat(var(--c, 4), 1fr); }
+    .steps.c2 { --c: 2; }
+    .steps.c4 { --c: 4; }
+    .steps.c5 { --c: 5; gap: 40px 44px; }
+
+    .step {
+      position: relative;
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 20px;
+      padding: 22px 14px 24px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: 600;
+      color: #f3f4f6;
+      line-height: 1.25;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 130px;
+    }
+    .step .n {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      background: #3b82f6;
+      color: #fff;
+      font-size: 19px;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 12px;
+      flex: none;
+    }
+    .step::after {
+      content: "→";
+      position: absolute;
+      right: -42px; top: 50%;
+      transform: translateY(-50%);
+      width: 32px;
+      text-align: center;
+      color: #3b82f6;
+      font-size: 30px;
+      font-weight: 700;
+    }
+    .steps.c5 .step::after { right: -38px; }
+    .step:last-child::after { display: none; }
+    .steps.c2 .step:nth-child(2n)::after { display: none; }
+    .steps.c4 .step:nth-child(4n)::after { display: none; }
+    .steps.c5 .step:nth-child(5n)::after { display: none; }
+    .steps.c2 .step { font-size: 24px; min-height: 150px; }
+
+    /* ===== Daftar ===== */
+    .list { list-style: none; margin: 4px 0 14px; }
+    .list li {
+      position: relative;
+      padding: 5px 0 5px 36px;
+      font-size: 27px;
+      color: #d1d5db;
+    }
+    .list li::before {
+      content: "▸";
+      position: absolute; left: 0;
+      color: #3b82f6; font-weight: 700;
+    }
+
+    /* ===== Tabel ===== */
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #1f2937;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+    .table th {
+      background: #0f172a;
+      color: #9ca3af;
+      font-size: 16px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      text-align: left;
+      padding: 16px 28px;
+    }
+    .table td {
+      padding: 15px 28px;
+      font-size: 26px;
+      color: #d1d5db;
+      border-bottom: 1px solid #374151;
+    }
+    .table tr:last-child td { border-bottom: none; }
+    .table td:first-child { font-weight: 700; color: #f3f4f6; width: 32%; }
+
+    /* ===== HUD (nomor slide + progress) ===== */
+    .hud {
+      position: absolute;
+      left: 0; right: 0; bottom: 16px;
+      padding: 0 84px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 15px;
+      color: #6b7280;
+      letter-spacing: .03em;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .hud-num { font-weight: 600; color: #9ca3af; }
+    .progress { position: absolute; left: 0; right: 0; bottom: 0; height: 5px; background: #1f2937; z-index: 10; }
+    .progress-fill {
+      height: 100%; width: 0;
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+      transition: width .45s cubic-bezier(.4,0,.2,1);
+    }
+
+    /* ===== Toast suara ===== */
+    .voice-toast {
+      position: absolute;
+      left: 84px; top: 16px;
+      transform: translateY(-10px);
+      background: rgba(15,23,42,.94);
+      border: 1px solid #3b82f6;
+      color: #e5e7eb;
+      font-size: 18px;
+      font-weight: 500;
+      padding: 8px 22px;
+      border-radius: 999px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s, transform .25s;
+      max-width: 40%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      z-index: 10;
+    }
+    .voice-toast.show { opacity: 1; transform: none; }
+    .voice-toast.ok { border-color: #10b981; color: #6ee7b7; }
+    .voice-toast.error { border-color: #ef4444; color: #fca5a5; }
+
+    /* ===== Kontrol ===== */
+    #controls {
+      position: fixed;
+      left: 50%; bottom: 14px;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 16px;
+      background: rgba(17,24,39,.88);
+      border: 1px solid #374151;
+      border-radius: 999px;
+      backdrop-filter: blur(8px);
+      z-index: 20;
+      transition: opacity .35s;
+    }
+    #controls.idle { opacity: 0; pointer-events: none; }
+
+    .btn {
+      width: 46px; height: 46px;
+      border-radius: 50%;
+      border: 1px solid #374151;
+      background: #1f2937;
+      color: #e5e7eb;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .2s;
+      user-select: none;
+    }
+    .btn:hover { background: #3b82f6; border-color: #3b82f6; color: #fff; transform: scale(1.06); }
+    .btn:active { transform: scale(.94); }
+    .btn:disabled { opacity: .3; cursor: not-allowed; transform: none; background: #1f2937; color: #6b7280; }
+
+    .btn.mic.listening {
+      background: #dc2626; border-color: #dc2626; color: #fff;
+      animation: pulse 1.4s infinite;
+    }
+    .btn.mic.unsupported { opacity: .35; cursor: not-allowed; }
+    @keyframes pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(220,38,38,.6); }
+      70%  { box-shadow: 0 0 0 14px rgba(220,38,38,0); }
+      100% { box-shadow: 0 0 0 0 rgba(220,38,38,0); }
+    }
+
+    .hint { font-size: 13px; color: #6b7280; padding: 0 6px 0 4px; white-space: nowrap; }
+    @media (max-width: 760px) { .hint { display: none; } }
+
+    @media (prefers-reduced-motion: reduce) {
+      .slide, .slide.active .fx { transition: none; animation: none; opacity: 1; }
+    }
+
+    /* ===== Panel status suara ===== */
+    .voice-panel {
+      position: absolute;
+      top: 18px; right: 22px;
+      display: flex; align-items: center; gap: 10px;
+      max-width: 55%;
+      background: rgba(15,23,42,.9);
+      border: 1px solid #374151;
+      border-radius: 999px;
+      padding: 8px 18px;
+      font-size: 16px;
+      color: #9ca3af;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s;
+      z-index: 10;
+    }
+    .voice-panel.show { opacity: 1; }
+    .voice-panel .vp-dot {
+      width: 12px; height: 12px; border-radius: 50%;
+      background: #6b7280; flex: none;
+    }
+    .voice-panel.listening { border-color: #dc2626; color: #e5e7eb; }
+    .voice-panel.listening .vp-dot { background: #dc2626; animation: pulse 1.4s infinite; }
+    .voice-panel.wait .vp-dot { background: #f59e0b; }
+    .voice-panel.error { border-color: #ef4444; color: #fca5a5; }
+    .voice-panel.error .vp-dot { background: #ef4444; }
+    .voice-panel .vp-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .btn.lang { font-size: 14px; font-weight: 700; letter-spacing: .03em; }
+  </style>
+</head>
+<body>
+
+<div id="viewport">
+  <div id="stage">
+
+    <!-- ===== SLIDES ===== -->
+    <section class="slide title-slide bh-slide">
+      <div id="bh-canvas-wrap"></div>
+      <div id="bh-vignette"></div>
+      <div id="bh-overlay">
+        <div class="bh-header">
+          <div class="bh-status-pill" id="bh-status-text">Fase I · Rasa Ingin Tahu</div>
+        </div>
+        <div class="bh-hud-bottom">
+          <div>
+            <div class="bh-metric">LANDASAN: <span class="bh-val" id="bh-landasan-val">ONTOLOGI · EPISTEMOLOGI</span></div>
+            <div class="bh-metric">METODE: <span class="bh-val" id="bh-metode-val">SISTEMATIS &amp; EMPIRIS</span></div>
+          </div>
+          <div style="text-align: right">
+            <div class="bh-metric">MODE_PIKIR: <span class="bh-val" id="bh-mode-val">KRITIS · LOGIS</span></div>
+            <div class="bh-metric">KONTEKS: <span class="bh-val" id="bh-konteks-val">ERA ARTIFICIAL INTELLIGENCE</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="center">
+        <span class="tag fx">BAB I · PENDAHULUAN</span>
+        <h1 class="fx">LANDASAN DAN<br>KERANGKA BERPIKIR ILMIAH</h1>
+        <div class="divider fx"></div>
+        <p class="subtitle fx">Dari Cara Manusia Memahami Dunia hingga Tantangan Berpikir di Era <em>Artificial Intelligence</em></p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <span class="tag fx">BAB II · ETIMOLOGI</span>
+      <h2 class="fx">Apa itu Kerangka?</h2>
+      <p class="lead fx"><span class="hl">Etimologi:</span> dari kata <em>kerangka</em> — susunan tulang yang menopang tubuh.</p>
+      <p class="lead fx">Dalam bahasa Inggris: <span class="hl">Framework</span> — dari <em>Frame</em> (bingkai/struktur) + <em>Work</em> (susunan yang bekerja).</p>
+      <div class="card blue fx mt">
+        <h4>Makna</h4>
+        <p>Kerangka bukanlah isi. Kerangka adalah <span class="hl">struktur</span> yang membuat sesuatu dapat berdiri, tersusun, dan memiliki arah.</p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <span class="tag fx">BAB II · ETIMOLOGI</span>
+      <h2 class="fx">Apa itu Berpikir?</h2>
+      <p class="lead fx"><span class="hl">Berpikir</span> berasal dari kata <em>pikir</em>.</p>
+      <div class="steps c2 fx mt-s">
+        <div class="step"><span class="n">1</span>Bahasa Inggris Kuno: <em>Þencan</em></div>
+        <div class="step"><span class="n">2</span>Mempertimbangkan, merenungkan, menghubungkan sesuatu dalam pikiran</div>
+      </div>
+      <p class="lead fx mt-s">Dalam filsafat Yunani dikenal istilah <span class="hl">Logos (λόγος)</span>:</p>
+      <div class="chips fx">
+        <span class="chip">Rasio</span><span class="chip">Akal</span><span class="chip">Penjelasan</span><span class="chip">Hukum Logis</span>
+      </div>
+      <p class="lead fx mt-s">Dari <em>Logos</em> lahir kata: <span class="hl">Logic · Logical · Logika</span></p>
+    </section>
+
+    <section class="slide">
+      <span class="tag fx">BAB II · ETIMOLOGI</span>
+      <h2 class="fx">Apa itu Ilmu?</h2>
+      <div class="cols-2 mt-s">
+        <div class="card fx">
+          <h4>🕌 Bahasa Arab</h4>
+          <p class="big">علم <span class="sub">('Ilm)</span></p>
+          <p>Berarti <span class="hl">mengetahui</span>.</p>
+        </div>
+        <div class="card fx">
+          <h4>🏛️ Tradisi Barat</h4>
+          <p class="big">Science</p>
+          <p>Dari Latin <em>Scientia</em> → <em>Scire</em> = <span class="hl">mengetahui melalui pembelajaran</span>.</p>
+        </div>
+      </div>
+      <p class="lead fx mt">Sehingga ilmu bukan sekadar mengetahui, tetapi <span class="hl">mengetahui berdasarkan proses</span>.</p>
+    </section>
+
+    <section class="slide">
+      <span class="tag fx">BAB II · ETIMOLOGI</span>
+      <h2 class="fx">Apa itu Kritis?</h2>
+      <p class="lead fx">Kata <em>Critical</em> berasal dari bahasa Yunani <span class="hl">Krinein</span>:</p>
+      <div class="chips fx">
+        <span class="chip">Memisahkan</span><span class="chip">Membedakan</span><span class="chip">Menilai</span><span class="chip">Menghakimi</span>
+      </div>
+      <p class="lead fx mt-s">Dari kata yang sama lahir: <span class="hl">Critique · Criterion · Crisis</span></p>
+      <div class="card blue fx mt">
+        <p><span class="hl">Makna:</span> Berpikir kritis bukan berarti suka membantah. Melainkan mampu <em>membedakan</em> mana informasi yang layak diterima dan mana yang perlu dipertanyakan.</p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <span class="tag fx">BAB III · DEFINISI</span>
+      <h2 class="fx">Apa itu Berpikir Ilmiah?</h2>
+      <div class="card blue fx mt-s">
+        <p class="statement">Berpikir ilmiah adalah cara menggunakan <span class="hl">akal, logika, bukti, dan metode yang sistematis</span> untuk memahami suatu fenomena sehingga menghasilkan kesimpulan yang dapat dipertanggungjawabkan.</p>
+      </div>
+      <p class="lead fx mt">Berpikir ilmiah bukan tentang menjadi "paling pintar", tetapi tentang <span class="hl">cara memperoleh pengetahuan yang benar</span>.</p>
+    </section>
+
+    <section class="slide">
+      <span class="tag fx">BAB III · DEFINISI</span>
+      <h2 class="fx">Apa itu Kerangka Berpikir Ilmiah?</h2>
+      <p class="lead fx">Struktur berpikir yang menghubungkan suatu masalah dengan konsep, teori, data, metode, analisis, hingga menghasilkan <span class="hl">kesimpulan yang logis</span>.</p>
+      <div class="steps c4 fx mt">
+        <div class="step"><span class="n">1</span>Masalah</div>
+        <div class="step"><span class="n">2</span>Pertanyaan</div>
+        <div class="step"><span class="n">3</span>Konsep</div>
+        <div class="step"><span class="n">4</span>Teori</div>
+        <div class="step"><span class="n">5</span>Metode</div>
+        <div class="step"><span class="n">6</span>Data</div>
+        <div class="step"><span class="n">7</span>Analisis</div>
+        <div class="step"><span class="n">8</span>Kesimpulan</div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <span class="tag fx">BAB IV · FILSAFAT ILMU</span>
+      <h2 class="fx">Mengapa Manusia Berpikir?</h2>
+      <p class="lead fx">Sejak ribuan tahun lalu manusia selalu bertanya:</p>
+      <ul class="list fx">
+        <li>Mengapa langit berwarna biru?</li>
+        <li>Mengapa hujan turun?</li>
+        <li>Mengapa manusia hidup?</li>
+      </ul>
+      <p class="lead fx">Dari rasa ingin tahu inilah lahir: <span class="hl">filsafat · ilmu pengetahuan · penelitian</span></p>
+      <div class="card blue fx mt-s">
+        <p class="strong">Ilmu berawal dari rasa ingin tahu, bukan dari jawaban.</p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <span class="tag fx">BAB IV · FILSAFAT ILMU</span>
+      <h2 class="fx">Tiga Landasan Filsafat Ilmu</h2>
+      <div class="cols-3 mt">
+        <div class="card pillar fx"><div class="label">Ontologi</div><p class="q">Apa yang dipelajari?</p></div>
+        <div class="card pillar fx"><div class="label">Epistemologi</div><p class="q">Bagaimana kita memperoleh pengetahuan?</p></div>
+        <div class="card pillar fx"><div class="label">Aksiologi</div><p class="q">Untuk apa pengetahuan digunakan?</p></div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <span class="tag fx">BAB IV · FILSAFAT ILMU</span>
+      <h2 class="fx">Contoh Sederhana: 📖 Buku</h2>
+      <div class="cols-3 mt">
+        <div class="card pillar fx"><div class="label">Ontologi</div><p class="q">Apa itu buku?</p></div>
+        <div class="card pillar fx"><div class="label">Epistemologi</div><p class="q">Bagaimana kita mengetahui bahwa itu buku?</p><p class="small">Melalui pengamatan, membaca, pengalaman.</p></div>
+        <div class="card pillar fx"><div class="label">Aksiologi</div><p class="q">Untuk apa buku dibuat?</p><p class="small">Sebagai media penyimpanan dan penyebaran pengetahuan.</p></div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <span class="tag fx">BAB V · BERPIKIR DALAM KEHIDUPAN SEHARI-HARI</span>
+      <h2 class="fx">Mengapa Kita Mudah Percaya?</h2>
+      <p class="lead fx">Dalam kehidupan sehari-hari kita menerima informasi dari:</p>
+      <div class="chips fx mt-s">
+        <span class="chip">📱 Media sosial</span><span class="chip">👥 Teman</span><span class="chip">🎓 Dosen</span>
+        <span class="chip">👨‍👩‍👧 Keluarga</span><span class="chip">🤖 AI</span><span class="chip">📰 Berita</span><span class="chip">⭐ Influencer</span>
+      </div>
+      <p class="question fx mt">Pertanyaannya: Apakah semua informasi tersebut benar?</p>
+    </section>
+
+    <section class="slide">
+      <span class="tag fx">BAB V · BERPIKIR DALAM KEHIDUPAN SEHARI-HARI</span>
+      <h2 class="fx">Informasi ≠ Pengetahuan</h2>
+      <div class="steps c4 fx mt-s">
+        <div class="step"><span class="n">1</span>Informasi</div>
+        <div class="step"><span class="n">2</span>Dipahami</div>
+        <div class="step"><span class="n">3</span>Diuji</div>
+        <div class="step"><span class="n">4</span>Menjadi Pengetahuan</div>
+      </div>
+      <div class="card blue fx mt">
+        <p>Ilmu tidak dimulai dari jawaban.</p>
+        <p class="strong hl">Ilmu dimulai dari proses menguji informasi.</p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <span class="tag fx">BAB V · BERPIKIR DALAM KEHIDUPAN SEHARI-HARI</span>
+      <h2 class="fx">Contoh Kasus</h2>
+      <div class="card red fx">
+        <p class="claim">"Minum kopi menyebabkan gagal ginjal."</p>
+        <p class="small">— pesan berantai di WhatsApp</p>
+      </div>
+      <p class="lead strong fx mt-s">Pertanyaan ilmiah:</p>
+      <ul class="list fx">
+        <li>Siapa yang mengatakan?</li>
+        <li>Apa sumbernya?</li>
+        <li>Apakah ada penelitian?</li>
+        <li>Bagaimana metode penelitiannya?</li>
+        <li>Apakah ada data pendukung?</li>
+      </ul>
+    </section>
+
+    <section class="slide">
+      <span class="tag fx">BAB VI · BERPIKIR KRITIS</span>
+      <h2 class="fx">Mengapa Berpikir Kritis Penting?</h2>
+      <div class="stack mt-s">
+        <div class="card red fx"><p>❌ Tidak semua yang <strong>viral</strong> adalah benar.</p></div>
+        <div class="card red fx"><p>❌ Tidak semua yang <strong>banyak dibagikan</strong> adalah fakta.</p></div>
+        <div class="card red fx"><p>❌ Tidak semua yang <strong>terdengar meyakinkan</strong> adalah pengetahuan.</p></div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <span class="tag fx">BAB VI · BERPIKIR KRITIS</span>
+      <h2 class="fx">Membedakan</h2>
+      <table class="table fx">
+        <thead><tr><th>Istilah</th><th>Makna</th></tr></thead>
+        <tbody>
+          <tr><td>Fakta</td><td>Dapat diverifikasi</td></tr>
+          <tr><td>Opini</td><td>Pendapat pribadi</td></tr>
+          <tr><td>Data</td><td>Memiliki bukti</td></tr>
+          <tr><td>Asumsi</td><td>Belum tentu benar</td></tr>
+          <tr><td>Argumentasi</td><td>Alasan</td></tr>
+          <tr><td>Kesimpulan</td><td>Hasil penalaran</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="slide">
+      <span class="tag fx">BAB VII · KERANGKA BERPIKIR ILMIAH</span>
+      <h2 class="fx">Kerangka Berpikir Ilmiah</h2>
+      <div class="steps c5 fx mt">
+        <div class="step"><span class="n">1</span>Fenomena</div>
+        <div class="step"><span class="n">2</span>Observasi</div>
+        <div class="step"><span class="n">3</span>Identifikasi Masalah</div>
+        <div class="step"><span class="n">4</span>Rumusan Masalah</div>
+        <div class="step"><span class="n">5</span>Hipotesis</div>
+        <div class="step"><span class="n">6</span>Metode</div>
+        <div class="step"><span class="n">7</span>Pengumpulan Data</div>
+        <div class="step"><span class="n">8</span>Analisis</div>
+        <div class="step"><span class="n">9</span>Kesimpulan</div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <span class="tag fx">BAB VII · KERANGKA BERPIKIR ILMIAH</span>
+      <h2 class="fx">Contoh: Mahasiswa</h2>
+      <p class="lead fx"><span class="hl">Masalah:</span> Mengapa IPK mahasiswa menurun?</p>
+      <p class="lead fx">Apakah karena:</p>
+      <div class="chips fx">
+        <span class="chip">📚 Kurikulum</span><span class="chip">📖 Kebiasaan belajar</span><span class="chip">📱 Media sosial</span><span class="chip">💰 Ekonomi</span>
+      </div>
+      <div class="card amber fx mt">
+        <p class="strong amber-text">⚠ Jangan langsung menyimpulkan. Kumpulkan data terlebih dahulu.</p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <span class="tag fx">BAB VIII · MANUSIA DAN TEKNOLOGI</span>
+      <h2 class="fx">Dulu dan Sekarang</h2>
+      <div class="cols-2 mt">
+        <div class="card gray fx">
+          <h4>🕰️ Dulu</h4>
+          <p>Tantangan manusia adalah <span class="hl">sulit mendapatkan informasi</span>.</p>
+        </div>
+        <div class="card amber fx">
+          <h4>⚡ Sekarang</h4>
+          <p>Tantangannya adalah <span class="hl">sulit menentukan informasi mana yang benar</span>.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <span class="tag fx">BAB VIII · MANUSIA DAN TEKNOLOGI</span>
+      <h2 class="fx">Bagaimana AI "Belajar"?</h2>
+      <div class="steps c4 fx mt-s">
+        <div class="step"><span class="n">1</span>Dataset</div>
+        <div class="step"><span class="n">2</span>Pre-training</div>
+        <div class="step"><span class="n">3</span>Model</div>
+        <div class="step"><span class="n">4</span>Prompt</div>
+        <div class="step"><span class="n">5</span>Transformer</div>
+        <div class="step"><span class="n">6</span>Perhitungan Probabilitas</div>
+        <div class="step"><span class="n">7</span>Token</div>
+        <div class="step"><span class="n">8</span>Jawaban</div>
+      </div>
+      <p class="lead fx mt-s">AI tidak menghafal jawaban. AI mempelajari <span class="hl">pola hubungan antar kata dan konsep</span>.</p>
+    </section>
+
+    <section class="slide">
+      <span class="tag fx">BAB VIII · MANUSIA DAN TEKNOLOGI</span>
+      <h2 class="fx">Mengapa AI Bisa Meyakinkan?</h2>
+      <p class="lead fx">Karena Transformer menghitung token dengan <span class="hl">probabilitas tertinggi</span> berdasarkan konteks.</p>
+      <div class="card red fx mt">
+        <p class="strong red-text">Namun probabilitas bukanlah kebenaran.</p>
+        <p>Jawaban yang paling mungkin muncul secara statistik belum tentu merupakan jawaban yang benar secara ilmiah.</p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <span class="tag fx">BAB VIII · MANUSIA DAN TEKNOLOGI</span>
+      <h2 class="fx">Mengapa Manusia Tetap Dibutuhkan?</h2>
+      <p class="lead fx">Karena manusia memiliki kemampuan yang tidak dimiliki AI:</p>
+      <ul class="list fx">
+        <li>Mengevaluasi bukti</li>
+        <li>Mempertimbangkan konteks sosial dan etika</li>
+        <li>Mengakui kesalahan</li>
+        <li>Merevisi kesimpulan ketika muncul bukti baru</li>
+      </ul>
+      <div class="card blue fx mt-s">
+        <p class="strong">Inilah inti dari berpikir ilmiah dan berpikir kritis.</p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <span class="tag fx">BAB IX · PENUTUP</span>
+      <h2 class="fx">Ringkasan</h2>
+      <div class="steps c4 fx mt">
+        <div class="step"><span class="n">1</span>Etimologi</div>
+        <div class="step"><span class="n">2</span>Definisi</div>
+        <div class="step"><span class="n">3</span>Filsafat Ilmu</div>
+        <div class="step"><span class="n">4</span>Berpikir Ilmiah</div>
+        <div class="step"><span class="n">5</span>Berpikir Kritis</div>
+        <div class="step"><span class="n">6</span>Kerangka Berpikir</div>
+        <div class="step"><span class="n">7</span>Metode Ilmiah</div>
+        <div class="step"><span class="n">8</span>Tantangan Era AI</div>
+      </div>
+    </section>
+
+    <section class="slide title-slide">
+      <div class="center">
+        <span class="tag fx">BAB IX · PENUTUP</span>
+        <p class="closing fx">"Di era ketika informasi dapat dibuat oleh siapa saja—bahkan oleh mesin—nilai seorang mahasiswa tidak lagi ditentukan oleh seberapa banyak informasi yang ia miliki, tetapi oleh kemampuannya menilai apakah informasi tersebut benar, relevan, dan dapat dipertanggungjawabkan."</p>
+      </div>
+    </section>
+
+    <!-- ===== HUD ===== -->
+    <div class="hud">
+      <span class="hud-title">Landasan &amp; Kerangka Berpikir Ilmiah</span>
+      <span class="hud-num" id="slideCounter">1 / 23</span>
+    </div>
+    <div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="voice-toast" id="voiceToast" aria-live="polite"></div>
+    <div class="voice-panel" id="voicePanel" aria-live="polite">
+      <span class="vp-dot"></span>
+      <span class="vp-text" id="voiceText"></span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== KONTROL ===== -->
+<div id="controls">
+  <button class="btn" id="prevBtn" aria-label="Sebelumnya" title="Sebelumnya (←)">←</button>
+  <button class="btn" id="nextBtn" aria-label="Berikutnya" title="Berikutnya (→)">→</button>
+  <button class="btn mic" id="micBtn" aria-label="Perintah suara" title="Perintah suara (M)">🎤</button>
+  <button class="btn lang" id="langBtn" aria-label="Bahasa suara" title="Bahasa pengenalan suara (L)">ID</button>
+  <button class="btn" id="fsBtn" aria-label="Layar penuh" title="Layar penuh (F)">⛶</button>
+  <span class="hint">Klik 🎤 lalu ucapkan: "lanjut", "kembali", "awal", "akhir", "slide 5"</span>
+</div>
+
+<script>
+(function () {
+  /* =========================================================
+     PANGGUNG 16:9 (scale otomatis seperti PowerPoint)
+     ========================================================= */
+  const STAGE_W = 1280, STAGE_H = 720;
+  const viewport = document.getElementById('viewport');
+  const stage = document.getElementById('stage');
+  const slides = Array.from(stage.querySelectorAll('.slide'));
+  const total = slides.length;
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const fsBtn = document.getElementById('fsBtn');
+  const controls = document.getElementById('controls');
+  const counter = document.getElementById('slideCounter');
+  const progressFill = document.getElementById('progressFill');
+
+  function isFullscreen() { return !!document.fullscreenElement; }
+
+  function fit() {
+    const fs = isFullscreen();
+    viewport.classList.toggle('fs', fs);
+    const availW = window.innerWidth - (fs ? 0 : 24);
+    const availH = window.innerHeight - (fs ? 0 : 84);
+    const scale = Math.min(availW / STAGE_W, availH / STAGE_H);
+    stage.style.transform = 'scale(' + scale + ')';
+  }
+  window.addEventListener('resize', fit);
+  document.addEventListener('fullscreenchange', fit);
+
+  slides.forEach(function (s) {
+    s.querySelectorAll('.fx').forEach(function (el, i) {
+      el.style.setProperty('--i', i);
+    });
+  });
+
+  /* =========================================================
+     NAVIGASI SLIDE
+     ========================================================= */
+  let current = 0;
+
+  function render() {
+    slides.forEach(function (s, i) {
+      s.classList.toggle('active', i === current);
+      s.classList.toggle('past', i < current);
+    });
+    counter.textContent = (current + 1) + ' / ' + total;
+    progressFill.style.width = ((current + 1) / total * 100) + '%';
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === total - 1;
+    window.dispatchEvent(new CustomEvent('slidechange', { detail: { index: current } }));
+  }
+
+  function go(i) {
+    const n = Math.max(0, Math.min(total - 1, i));
+    if (n === current) return false;
+    current = n;
+    render();
+    return true;
+  }
+
+  prevBtn.addEventListener('click', function () { go(current - 1); });
+  nextBtn.addEventListener('click', function () { go(current + 1); });
+
+  function toggleFullscreen() {
+    try {
+      if (isFullscreen()) {
+        document.exitFullscreen();
+      } else {
+        const p = document.documentElement.requestFullscreen();
+        if (p && p.catch) p.catch(function () {
+          showToast('Layar penuh diblokir. Buka pen via Full Page / Debug.', 'error');
+        });
+      }
+    } catch (e) {
+      showToast('Layar penuh tidak tersedia.', 'error');
+    }
+  }
+  fsBtn.addEventListener('click', toggleFullscreen);
+
+  document.addEventListener('keydown', function (e) {
+    const k = e.key;
+    const onButton = e.target && e.target.tagName === 'BUTTON';
+    if (k === 'ArrowRight' || k === 'PageDown' || ((k === ' ' || k === 'Enter') && !onButton)) {
+      e.preventDefault(); go(current + 1);
+    } else if (k === 'ArrowLeft' || k === 'PageUp' || k === 'Backspace') {
+      e.preventDefault(); go(current - 1);
+    } else if (k === 'Home') { go(0); }
+    else if (k === 'End') { go(total - 1); }
+    else if (k.toLowerCase() === 'f') { toggleFullscreen(); }
+    else if (k.toLowerCase() === 'm') { toggleVoice(); }
+    else if (k.toLowerCase() === 'l') { cycleLang(); }
+  });
+
+  let touchX = 0;
+  stage.addEventListener('touchstart', function (e) {
+    touchX = e.changedTouches[0].screenX;
+  }, { passive: true });
+  stage.addEventListener('touchend', function (e) {
+    const d = touchX - e.changedTouches[0].screenX;
+    if (Math.abs(d) > 50) go(current + (d > 0 ? 1 : -1));
+  }, { passive: true });
+
+  let idleTimer = null;
+  function wake() {
+    controls.classList.remove('idle');
+    clearTimeout(idleTimer);
+    if (isFullscreen()) {
+      idleTimer = setTimeout(function () { controls.classList.add('idle'); }, 2500);
+    }
+  }
+  document.addEventListener('mousemove', wake);
+  document.addEventListener('fullscreenchange', wake);
+
+  /* =========================================================
+     PERINTAH SUARA (Web Speech API)
+     ========================================================= */
+  const micBtn = document.getElementById('micBtn');
+  const langBtn = document.getElementById('langBtn');
+  const toast = document.getElementById('voiceToast');
+  const panel = document.getElementById('voicePanel');
+  const panelText = document.getElementById('voiceText');
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  const COMMANDS = {
+    next:  ['next', 'nex', 'neks', 'nekst', 'lanjut', 'lanjutkan', 'lanjutin', 'berikutnya', 'selanjutnya', 'maju'],
+    prev:  ['back', 'bek', 'bak', 'previous', 'sebelumnya', 'kembali', 'mundur'],
+    first: ['awal', 'first', 'slide pertama', 'halaman pertama'],
+    last:  ['terakhir', 'last', 'slide akhir', 'halaman akhir']
+  };
+
+  const NUMBER_WORDS = {
+    satu: 1, dua: 2, tiga: 3, empat: 4, lima: 5, enam: 6, tujuh: 7, delapan: 8, sembilan: 9,
+    sepuluh: 10, sebelas: 11, 'dua belas': 12, 'tiga belas': 13, 'empat belas': 14, 'lima belas': 15,
+    'enam belas': 16, 'tujuh belas': 17, 'delapan belas': 18, 'sembilan belas': 19, 'dua puluh': 20,
+    'dua puluh satu': 21, 'dua puluh dua': 22, 'dua puluh tiga': 23,
+    one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10,
+    eleven: 11, twelve: 12, thirteen: 13, fourteen: 14, fifteen: 15, sixteen: 16, seventeen: 17,
+    eighteen: 18, nineteen: 19, twenty: 20
+  };
+
+  const LANGS = [
+    { code: 'id-ID', label: 'ID' },
+    { code: 'en-US', label: 'EN' }
+  ];
+  let langIndex = 0;
+
+  let recognition = null;
+  let listening = false;
+  let starting = false;
+  let lastCmd = 0;
+  const COOLDOWN = 900;
+  let toastTimer = null;
+  let errorCount = 0;
+
+  function showToast(text, type) {
+    toast.textContent = text;
+    toast.className = 'voice-toast show' + (type ? ' ' + type : '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toast.classList.remove('show'); }, 2600);
+  }
+
+  function setPanel(state, text) {
+    panel.className = 'voice-panel' + (state === 'off' ? '' : ' show ' + state);
+    panelText.textContent = text || '';
+    micBtn.classList.toggle('listening', state === 'listening');
+    micBtn.textContent = (state === 'listening' || state === 'wait') ? '⏹' : '🎤';
+  }
+
+  function inIframe() {
+    try { return window.self !== window.top; } catch (e) { return true; }
+  }
+
+  function escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+  function hasWord(text, list) {
+    return list.some(function (w) {
+      return new RegExp('(^|\\s)' + escapeRe(w) + '(\\s|$)').test(text);
+    });
+  }
+
+  function extractNumber(text) {
+    const d = text.match(/\b(\d{1,2})\b/);
+    if (d) return parseInt(d[1], 10);
+    const keys = Object.keys(NUMBER_WORDS).sort(function (a, b) { return b.length - a.length; });
+    for (let i = 0; i < keys.length; i++) {
+      if (new RegExp('(^|\\s)' + keys[i] + '(\\s|$)').test(text)) return NUMBER_WORDS[keys[i]];
+    }
+    return null;
+  }
+
+  function handleCommand(raw) {
+    const text = raw.toLowerCase().replace(/[.,!?]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!text) return false;
+    const now = Date.now();
+    if (now - lastCmd < COOLDOWN) return false;
+
+    let done = false;
+
+    if (/(^|\s)(slide|slides|halaman|nomor|ke|go to|page|geser)(\s|$)/.test(text)) {
+      const n = extractNumber(text);
+      if (n && n >= 1 && n <= total) {
+        go(n - 1);
+        showToast('🎯 Slide ' + n, 'ok');
+        done = true;
+      }
+    }
+    if (!done) {
+      if (hasWord(text, COMMANDS.first)) { go(0); showToast('⏮ Slide pertama', 'ok'); done = true; }
+      else if (hasWord(text, COMMANDS.last)) { go(total - 1); showToast('⏭ Slide terakhir', 'ok'); done = true; }
+      else if (hasWord(text, COMMANDS.prev)) { go(current - 1); showToast('← Sebelumnya', 'ok'); done = true; }
+      else if (hasWord(text, COMMANDS.next)) { go(current + 1); showToast('→ Berikutnya', 'ok'); done = true; }
+    }
+    if (done) lastCmd = now;
+    return done;
+  }
+
+  function errorMessage(code) {
+    switch (code) {
+      case 'not-allowed':
+      case 'service-not-allowed':
+        return inIframe()
+          ? 'Mikrofon diblokir di editor CodePen. Buka via Change View → Full Page / Debug, lalu klik Izinkan.'
+          : 'Izin mikrofon ditolak. Klik ikon gembok di address bar → izinkan Mikrofon.';
+      case 'audio-capture':
+      case 'NotFoundError':
+        return 'Mikrofon tidak ditemukan. Sambungkan mikrofon lalu coba lagi.';
+      case 'network':
+        return 'Pengenalan suara butuh internet (server Google). Periksa koneksi Anda.';
+      case 'language-not-supported':
+        return 'Bahasa tidak didukung. Tekan tombol ID/EN untuk ganti bahasa.';
+      default:
+        return 'Gagal menyalakan suara (' + code + ').';
+    }
+  }
+
+  function fatal(code) {
+    listening = false;
+    starting = false;
+    const msg = errorMessage(code);
+    setPanel('error', msg);
+    clearTimeout(fatal._t);
+    fatal._t = setTimeout(function () {
+      if (!listening) setPanel('off');
+    }, 7000);
+  }
+
+  function createRecognition() {
+    const rec = new SR();
+    rec.lang = LANGS[langIndex].code;
+    rec.continuous = true;
+    rec.interimResults = true;
+    rec.maxAlternatives = 3;
+
+    rec.onstart = function () {
+      errorCount = 0;
+      setPanel('listening', 'Mendengarkan… ucapkan "lanjut" / "kembali"');
+    };
+
+    rec.onresult = function (event) {
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const res = event.results[i];
+        panelText.textContent = '🗣 ' + res[0].transcript.trim();
+        for (let a = 0; a < res.length; a++) {
+          if (handleCommand(res[a].transcript)) {
+            try { rec.abort(); } catch (e) {}
+            return;
+          }
+        }
+      }
+    };
+
+    rec.onerror = function (ev) {
+      if (ev.error === 'no-speech' || ev.error === 'aborted') return;
+      fatal(ev.error);
+    };
+
+    rec.onend = function () {
+      if (!listening) { setPanel('off'); return; }
+      errorCount++;
+      if (errorCount > 40) { fatal('unknown'); return; }
+      setTimeout(function () {
+        if (listening) {
+          try { rec.start(); } catch (e) {}
+        }
+      }, 250);
+    };
+    return rec;
+  }
+
+  function requestMic() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      return Promise.resolve();
+    }
+    return navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
+      stream.getTracks().forEach(function (t) { t.stop(); });
+    });
+  }
+
+  function startVoice() {
+    if (starting || listening) return;
+    starting = true;
+    setPanel('wait', 'Menunggu izin mikrofon… klik "Izinkan"');
+
+    requestMic().then(function () {
+      if (!starting) return;
+      starting = false;
+      listening = true;
+      errorCount = 0;
+      recognition = createRecognition();
+      try {
+        recognition.start();
+      } catch (e) {
+        fatal('start-failed');
+      }
+    }).catch(function (err) {
+      fatal(err && err.name === 'NotAllowedError' ? 'not-allowed' : (err && err.name) || 'unknown');
+    });
+  }
+
+  function stopVoice() {
+    listening = false;
+    starting = false;
+    if (recognition) { try { recognition.stop(); } catch (e) {} }
+    setPanel('off');
+    showToast('🔇 Perintah suara dimatikan');
+  }
+
+  function toggleVoice() {
+    if (!SR) {
+      setPanel('error', 'Gunakan Chrome / Edge (Firefox & Safari belum mendukung).');
+      return;
+    }
+    (listening || starting) ? stopVoice() : startVoice();
+  }
+
+  function cycleLang() {
+    langIndex = (langIndex + 1) % LANGS.length;
+    langBtn.textContent = LANGS[langIndex].label;
+    showToast('Bahasa suara: ' + LANGS[langIndex].code, 'ok');
+    if (listening) {
+      const wasRec = recognition;
+      listening = false;
+      try { wasRec.abort(); } catch (e) {}
+      setTimeout(startVoice, 400);
+    }
+  }
+
+  if (!SR) {
+    micBtn.classList.add('unsupported');
+    micBtn.title = 'Web Speech API tidak didukung di browser ini';
+  }
+  micBtn.addEventListener('click', toggleVoice);
+  langBtn.addEventListener('click', cycleLang);
+
+  window.__deck = { say: handleCommand, go: go, current: function () { return current + 1; } };
+
+  /* ===== Init ===== */
+  fit();
+  render();
+  wake();
+})();
+</script>
+
+<script type="module">
+  import * as THREE from 'three';
+  import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+  import gsap from 'gsap';
+
+  const container = document.getElementById('bh-canvas-wrap');
+  const WIDTH = 1280;
+  const HEIGHT = 720;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(40, WIDTH / HEIGHT, 0.1, 1000);
+  camera.position.set(60, 25, 60);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+  renderer.setSize(WIDTH, HEIGHT);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.6;
+  container.appendChild(renderer.domElement);
+
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.03;
+  controls.enableZoom = false;
+  controls.autoRotate = true;
+  controls.autoRotateSpeed = 0.4;
+
+  const noiseChunk = `
+    vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+    vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+    vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
+    vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+    float snoise(vec3 v) {
+      const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;
+      const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);
+      vec3 i  = floor(v + dot(v, C.yyy) );
+      vec3 x0 = v - i + dot(i, C.xxx) ;
+      vec3 g = step(x0.yzx, x0.xyz);
+      vec3 l = 1.0 - g;
+      vec3 i1 = min( g.xyz, l.zxy );
+      vec3 i2 = max( g.xyz, l.zxy );
+      vec3 x1 = x0 - i1 + C.xxx;
+      vec3 x2 = x0 - i2 + C.yyy;
+      vec3 x3 = x0 - D.yyy;
+      i = mod289(i);
+      vec4 p = permute( permute( permute( i.z + vec4(0.0, i1.z, i2.z, 1.0 )) + i.y + vec4(0.0, i1.y, i2.y, 1.0 )) + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));
+      float n_ = 0.142857142857;
+      vec3  ns = n_ * D.wyz - D.xzx;
+      vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
+      vec4 x_ = floor(j * ns.z);
+      vec4 y_ = floor(j - 7.0 * x_ );
+      vec4 x = x_ *ns.x + ns.yyyy;
+      vec4 y = y_ *ns.x + ns.yyyy;
+      vec4 h = 1.0 - abs(x) - abs(y);
+      vec4 b0 = vec4( x.xy, y.xy );
+      vec4 b1 = vec4( x.zw, y.zw );
+      vec4 s0 = floor(b0)*2.0 + 1.0;
+      vec4 s1 = floor(b1)*2.0 + 1.0;
+      vec4 sh = -step(h, vec4(0.0));
+      vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ;
+      vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww ;
+      vec3 p0 = vec3(a0.xy,h.x);
+      vec3 p1 = vec3(a0.zw,h.y);
+      vec3 p2 = vec3(a1.xy,h.z);
+      vec3 p3 = vec3(a1.zw,h.w);
+      vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2,p2), dot(p3,p3)));
+      p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
+      vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
+      m = m * m;
+      return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3) ) );
+    }
+  `;
+
+  const coreGroup = new THREE.Group();
+  scene.add(coreGroup);
+
+  const bhMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+  const bhGeo = new THREE.SphereGeometry(4, 64, 64);
+  coreGroup.add(new THREE.Mesh(bhGeo, bhMat));
+
+  const auraMat = new THREE.ShaderMaterial({
+    uniforms: { uTime: { value: 0 }, uIntensity: { value: 1.0 } },
+    vertexShader: `
+      varying vec3 vNormal;
+      varying vec3 vView;
+      void main() {
+        vNormal = normalize(normalMatrix * normal);
+        vView = normalize(-(modelViewMatrix * vec4(position, 1.0)).xyz);
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: `
+      uniform float uIntensity;
+      varying vec3 vNormal;
+      varying vec3 vView;
+      void main() {
+        float rim = pow(1.0 - max(dot(vNormal, vView), 0.0), 4.0);
+        gl_FragColor = vec4(vec3(1.0, 0.45, 0.1) * rim * uIntensity * 5.0, 1.0);
+      }
+    `,
+    side: THREE.BackSide, transparent: true, blending: THREE.AdditiveBlending
+  });
+  coreGroup.add(new THREE.Mesh(new THREE.SphereGeometry(4.25, 64, 64), auraMat));
+
+  const instanceCount = 5000;
+  const streakGeo = new THREE.CylinderGeometry(0.01, 0.12, 2.2, 3);
+  streakGeo.rotateX(Math.PI / 2);
+
+  const diskMaterial = new THREE.ShaderMaterial({
+    uniforms: {
+      uTime: { value: 0 },
+      uMorph: { value: 0.1 },
+      uCompression: { value: 1.0 },
+      uIntensity: { value: 1.0 },
+      uOrbitScale: { value: 1.0 }
+    },
+    vertexShader: `
+      ${noiseChunk}
+      uniform float uTime;
+      uniform float uMorph;
+      uniform float uCompression;
+      uniform float uIntensity;
+      uniform float uOrbitScale;
+      varying vec3 vColor;
+      varying float vOpacity;
+      void main() {
+        vec4 instPos = instanceMatrix * vec4(0.0, 0.0, 0.0, 1.0);
+        float rOriginal = length(instPos.xz);
+        float r = rOriginal * uCompression;
+        float initialAngle = atan(instPos.z, instPos.x);
+        float orbitalVelocity = (1.5 / sqrt(rOriginal)) * uOrbitScale;
+        float currentAngle = initialAngle + (uTime * orbitalVelocity);
+        vec3 morphedWorldPos = vec3(cos(currentAngle) * r, instPos.y, sin(currentAngle) * r);
+        float noise = snoise(vec3(morphedWorldPos.x * 0.08, morphedWorldPos.z * 0.08, uTime * 0.3));
+        morphedWorldPos.y += noise * uMorph * 4.0;
+        vec3 viewDir = normalize(cameraPosition - morphedWorldPos);
+        vec3 orbitDir = normalize(vec3(-sin(currentAngle), 0.0, cos(currentAngle)));
+        float doppler = dot(orbitDir, viewDir);
+        vec3 hot = vec3(1.0, 0.95, 0.9);
+        vec3 warm = vec3(1.0, 0.45, 0.1);
+        vec3 cool = vec3(0.1, 0.35, 1.0);
+        vec3 color = mix(cool, warm, smoothstep(45.0, 12.0, r));
+        color = mix(color, hot, smoothstep(10.0, 4.0, r));
+        vColor = color * (1.3 + doppler * 0.7) * uIntensity;
+        vOpacity = (smoothstep(3.8, 5.5, r) * (1.0 - smoothstep(38.0, 48.0, r))) * 0.8;
+        float deltaAngle = currentAngle - initialAngle;
+        float c = cos(deltaAngle);
+        float s = sin(deltaAngle);
+        mat3 rotY = mat3(
+          c, 0, s,
+          0, 1, 0,
+         -s, 0, c
+        );
+        vec3 localPos = (instanceMatrix * vec4(position, 0.0)).xyz;
+        vec3 rotatedLocalPos = rotY * localPos;
+        gl_Position = projectionMatrix * viewMatrix * vec4(morphedWorldPos + rotatedLocalPos, 1.0);
+      }
+    `,
+    fragmentShader: `
+      varying vec3 vColor;
+      varying float vOpacity;
+      void main() {
+        gl_FragColor = vec4(vColor, vOpacity);
+      }
+    `,
+    transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
+  });
+
+  const instancedDisk = new THREE.InstancedMesh(streakGeo, diskMaterial, instanceCount);
+  const dummy = new THREE.Object3D();
+
+  for (let i = 0; i < instanceCount; i++) {
+    const r = 5 + Math.pow(Math.random(), 1.3) * 40;
+    const angle = Math.random() * Math.PI * 2;
+    dummy.position.set(Math.cos(angle) * r, (Math.random() - 0.5) * (8 / r), Math.sin(angle) * r);
+    dummy.lookAt(dummy.position.x + Math.sin(angle), dummy.position.y, dummy.position.z - Math.cos(angle));
+    dummy.updateMatrix();
+    instancedDisk.setMatrixAt(i, dummy.matrix);
+  }
+  scene.add(instancedDisk);
+
+  const config = [
+    {
+      status: 'Fase I · Rasa Ingin Tahu',
+      mode: 'KRITIS · LOGIS',
+      konteks: 'FILSAFAT ILMU',
+      morph: 0.1, compress: 1.0, intensity: 1.0, rotate: 0.4, camY: 25, camDist: 85, orbit: 1.0,
+      color: '#00f3ff'
+    },
+    {
+      status: 'Fase II · Pengujian Bukti & Data',
+      mode: 'ANALITIS · EMPIRIS',
+      konteks: 'METODE ILMIAH',
+      morph: 4.5, compress: 1.15, intensity: 1.4, rotate: 1.5, camY: 45, camDist: 95, orbit: 1.8,
+      color: '#ffaa00'
+    },
+    {
+      status: 'Fase III · Tantangan Era AI',
+      mode: 'REFLEKTIF · ETIS',
+      konteks: 'ERA ARTIFICIAL INTELLIGENCE',
+      morph: 0.8, compress: 0.38, intensity: 3.5, rotate: 5.0, camY: 12, camDist: 55, orbit: 4.5,
+      color: '#60a5fa'
+    }
+  ];
+
+  let stateIdx = 0;
+  let isActiveSlide = true;
+  const statusText = document.getElementById('bh-status-text');
+  const modeVal = document.getElementById('bh-mode-val');
+  const konteksVal = document.getElementById('bh-konteks-val');
+  const hudVals = document.querySelectorAll('.bh-val');
+  const camControl = { distance: 85 };
+
+  function transition() {
+    if (!isActiveSlide) return;
+    stateIdx = (stateIdx + 1) % config.length;
+    const s = config[stateIdx];
+    const tl = gsap.timeline({ defaults: { duration: 4.0, ease: 'power2.inOut' } });
+    tl.to(diskMaterial.uniforms.uMorph, { value: s.morph }, 0);
+    tl.to(diskMaterial.uniforms.uCompression, { value: s.compress }, 0);
+    tl.to(diskMaterial.uniforms.uIntensity, { value: s.intensity }, 0);
+    tl.to(diskMaterial.uniforms.uOrbitScale, { value: s.orbit }, 0);
+    tl.to(auraMat.uniforms.uIntensity, { value: s.intensity }, 0);
+    tl.to(controls, { autoRotateSpeed: s.rotate }, 0);
+    tl.to(camera.position, { y: s.camY }, 0);
+    tl.to(camControl, { distance: s.camDist }, 0);
+    gsap.to([statusText, ...hudVals], {
+      opacity: 0,
+      duration: 0.8,
+      onComplete: () => {
+        statusText.innerText = s.status;
+        statusText.style.color = s.color;
+        statusText.style.borderColor = s.color;
+        modeVal.innerText = s.mode;
+        konteksVal.innerText = s.konteks;
+        hudVals.forEach((el) => { el.style.color = s.color; });
+        gsap.to([statusText, ...hudVals], { opacity: 1, duration: 1.2 });
+      }
+    });
+  }
+
+  setInterval(transition, 10000);
+
+  const clock = new THREE.Clock();
+  let rafId = null;
+
+  function animate() {
+    if (!isActiveSlide) {
+      rafId = null;
+      return;
+    }
+    const time = clock.getElapsedTime();
+    diskMaterial.uniforms.uTime.value = time;
+    auraMat.uniforms.uTime.value = time;
+    instancedDisk.rotation.y += 0.0005;
+    const currentDir = new THREE.Vector3().subVectors(camera.position, controls.target).normalize();
+    camera.position.x = controls.target.x + currentDir.x * camControl.distance;
+    camera.position.z = controls.target.z + currentDir.z * camControl.distance;
+    controls.update();
+    renderer.render(scene, camera);
+    rafId = requestAnimationFrame(animate);
+  }
+
+  window.addEventListener('slidechange', (e) => {
+    const active = e.detail.index === 0;
+    if (active && !isActiveSlide) {
+      isActiveSlide = true;
+      clock.start();
+      if (!rafId) animate();
+    } else if (!active && isActiveSlide) {
+      isActiveSlide = false;
+    }
+  });
+
+  animate();
+</script>
+</body>
+</html>
