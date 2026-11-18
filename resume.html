@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eko Wahyudi — IT Officer / Fullstack Developer</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-outer: #090e1a;
+      --bg-card: #0d1424;
+      --bg-panel: #10192d;
+      --bg-chip: #111c33;
+      --border-main: #233048;
+      --border-subtle: #1e2a42;
+      --border-chip: #33425e;
+      --accent: #34d399;
+      --accent-soft: rgba(52, 211, 153, 0.14);
+      --text-bright: #f8fafc;
+      --text-primary: #cbd5e1;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg-outer);
+      background-image:
+        radial-gradient(900px 600px at 15% 0%, rgba(52, 211, 153, 0.05), transparent 60%),
+        radial-gradient(800px 600px at 85% 100%, rgba(59, 130, 246, 0.06), transparent 60%);
+      color: var(--text-primary);
+      font-family: 'JetBrains Mono', monospace;
+      line-height: 1.65;
+      padding: 36px 20px 56px;
+      min-height: 100vh;
+    }
+
+    /* ===== Top Nav Bar (subtle, hidden on print) ===== */
+    .top-bar {
+      max-width: 1060px;
+      margin: 0 auto 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    .top-bar a,
+    .top-bar button {
+      color: var(--text-muted);
+      text-decoration: none;
+      background: rgba(16, 25, 45, 0.85);
+      border: 1px solid var(--border-main);
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+    }
+
+    .top-bar a:hover,
+    .top-bar button:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    /* ===== Main Resume Container ===== */
+    .resume-frame {
+      max-width: 1060px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-main);
+      border-radius: 28px;
+      padding: 52px 54px 56px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+    }
+
+    /* ===== Header ===== */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 34px;
+      margin-bottom: 44px;
+    }
+
+    .avatar-box {
+      width: 132px;
+      height: 132px;
+      flex: none;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1.5px solid var(--border-chip);
+      background: linear-gradient(145deg, #16223a, #0b1120);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .avatar-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .avatar-fallback {
+      font-family: 'Inter', sans-serif;
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      color: var(--accent);
+      text-shadow: 0 2px 18px rgba(52, 211, 153, 0.25);
+      user-select: none;
+    }
+
+    .identity h1 {
+      font-family: 'Inter', sans-serif;
+      font-size: 40px;
+      font-weight: 800;
+      color: var(--text-bright);
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+
+    .identity .role {
+      font-family: 'Inter', sans-serif;
+      font-size: 19px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-top: 4px;
+      margin-bottom: 14px;
+    }
+
+    .contact-list {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      font-size: 13.5px;
+      color: var(--text-primary);
+    }
+
+    .contact-list a {
+      color: inherit;
+      text-decoration: none;
+      width: fit-content;
+      transition: color 0.2s;
+    }
+
+    .contact-list a:hover {
+      color: var(--accent);
+    }
+
+    /* ===== Grid Layout ===== */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 310px;
+      gap: 44px;
+      align-items: start;
+    }
+
+    /* ===== Section Headings ===== */
+    .cmd-heading {
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--text-bright);
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: -0.01em;
+    }
+
+    .cmd-heading .prompt {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* ===== About Me ===== */
+    .about-section {
+      margin-bottom: 42px;
+    }
+
+    .about-text {
+      font-size: 13.2px;
+      line-height: 1.78;
+      color: var(--text-muted);
+      text-align: justify;
+    }
+
+    /* ===== Experience Log & Timeline ===== */
+    .timeline {
+      position: relative;
+      padding-left: 28px;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 5px;
+      top: 10px;
+      bottom: 12px;
+      width: 1.5px;
+      background: var(--border-main);
+    }
+
+    .exp-item {
+      position: relative;
+      margin-bottom: 34px;
+    }
+
+    .exp-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .exp-node {
+      position: absolute;
+      left: -28px;
+      top: 5px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 2.5px solid var(--accent);
+      background: var(--bg-card);
+      box-shadow: 0 0 0 4px var(--bg-card);
+    }
+
+    .exp-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .exp-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-bright);
+    }
+
+    .exp-title .company {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .exp-period {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    .exp-intro {
+      font-size: 12.8px;
+      color: var(--text-muted);
+      line-height: 1.72;
+      margin-bottom: 16px;
+    }
+
+    .exp-subhead {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 18px 0 10px;
+    }
+
+    .bullet-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .bullet-list li {
+      position: relative;
+      padding-left: 18px;
+      font-size: 12.6px;
+      line-height: 1.65;
+      color: var(--text-muted);
+    }
+
+    .bullet-list li::before {
+      content: "◦";
+      position: absolute;
+      left: 0;
+      top: 0;
+      color: var(--text-dim);
+      font-weight: 700;
+    }
+
+    .bullet-list li strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    /* ===== Sidebar Cards ===== */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .side-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-main);
+      border-radius: 14px;
+      padding: 22px 22px 24px;
+    }
+
+    .side-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-bright);
+      padding-bottom: 12px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--border-main);
+    }
+
+    .skill-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+
+    .skill-item {
+      border: 1px solid var(--border-chip);
+      background: var(--bg-chip);
+      border-radius: 6px;
+      padding: 10px 14px;
+      text-align: center;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--text-primary);
+      line-height: 1.45;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .skill-item:hover {
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .edu-school {
+      font-family: 'Inter', sans-serif;
+      font-size: 15.5px;
+      font-weight: 700;
+      color: var(--text-bright);
+      margin-bottom: 4px;
+    }
+
+    .edu-detail {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .lang-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 13.5px;
+      color: var(--text-muted);
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 920px) {
+      .resume-frame {
+        padding: 36px 28px;
+        border-radius: 20px;
+      }
+      .content-grid {
+        grid-template-columns: 1fr;
+        gap: 36px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      body {
+        padding: 16px 12px 36px;
+      }
+      .resume-frame {
+        padding: 26px 20px;
+      }
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+      }
+      .identity h1 {
+        font-size: 30px;
+      }
+      .about-text {
+        text-align: left;
+      }
+    }
+
+    /* ===== Print ===== */
+    @media print {
+      body {
+        background: #0d1424;
+        padding: 0;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .top-bar {
+        display: none;
+      }
+      .resume-frame {
+        border: none;
+        box-shadow: none;
+        padding: 24px 28px;
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <a href="index.html">← Kembali ke Presentasi</a>
+    <button type="button" onclick="window.print()">Cetak / Simpan PDF</button>
+  </div>
+
+  <main class="resume-frame">
+    <!-- ===== Header ===== -->
+    <header class="header">
+      <div class="avatar-box">
+        <span class="avatar-fallback">EW</span>
+      </div>
+      <div class="identity">
+        <h1>Eko Wahyudi</h1>
+        <div class="role">IT Officer/Fullstack Developer</div>
+        <div class="contact-list">
+          <a href="tel:+6281242818143">0812-4281-8143</a>
+          <a href="mailto:we.wahyudieko@gmail.com">we.wahyudieko@gmail.com</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===== Two-Column Content ===== -->
+    <div class="content-grid">
+      <!-- Left Column -->
+      <div class="main-col">
+        <section class="about-section">
+          <h2 class="cmd-heading"><span class="prompt">&gt;_</span> About_Me</h2>
+          <p class="about-text">
+            Profesional Teknologi Informasi dengan pengalaman lebih dari 8 tahun sebagai IT Officer serta lebih dari 10 tahun sebagai freelance Web Designer dan Software Developer. Berpengalaman mengembangkan aplikasi web, sistem informasi akademik, serta solusi berbasis Artificial Intelligence (AI) dan Blockchain/Web3. Memiliki keahlian dalam pengembangan full-stack, perancangan arsitektur sistem, integrasi API, dan pengelolaan infrastruktur TI. Berorientasi pada penyelesaian masalah melalui solusi yang aman, skalabel, dan inovatif.
+          </p>
+        </section>
+
+        <section class="experience-section">
+          <h2 class="cmd-heading"><span class="prompt">&gt;_</span> ~/experience_log</h2>
+
+          <div class="timeline">
+            <!-- Experience 1 -->
+            <article class="exp-item">
+              <span class="exp-node" aria-hidden="true"></span>
+              <div class="exp-header">
+                <div class="exp-title">IT Officer <span class="company">| PT Cahaya Pengajaran Abadi</span></div>
+                <div class="exp-period">2018 – PRESENT</div>
+              </div>
+              <ul class="bullet-list">
+                <li>Mengelola infrastruktur teknologi informasi perusahaan, termasuk server, jaringan, perangkat keras, dan sistem keamanan.</li>
+                <li>Mengembangkan serta memelihara aplikasi dan sistem internal untuk mendukung operasional perusahaan.</li>
+                <li>Merancang, mengembangkan, dan memelihara website perusahaan serta melakukan integrasi dengan layanan pihak ketiga melalui API.</li>
+                <li>Memberikan dukungan teknis kepada pengguna, melakukan pemeliharaan sistem, serta memastikan ketersediaan layanan TI.</li>
+                <li>Berkolaborasi dengan berbagai divisi untuk mengembangkan solusi digital yang meningkatkan efisiensi proses bisnis.</li>
+              </ul>
+            </article>
+
+            <!-- Experience 2 -->
+            <article class="exp-item">
+              <span class="exp-node" aria-hidden="true"></span>
+              <div class="exp-header">
+                <div class="exp-title">Freelancer</div>
+                <div class="exp-period">2014 – PRESENT</div>
+              </div>
+              <p class="exp-intro">
+                Menyediakan layanan pengembangan aplikasi web, desain website, solusi Artificial Intelligence (AI), Blockchain/Web3, serta konsultasi transformasi digital bagi perusahaan, institusi pendidikan, UMKM, dan komunitas.
+              </p>
+
+              <div class="exp-subhead">Proyek AI &amp; Academic Technology</div>
+              <ul class="bullet-list">
+                <li><strong>Academic Intelligence Management System (AIMS)</strong> — Platform pemantauan akademik berbasis AI untuk Fakultas Ilmu Budaya, Universitas Hasanuddin.</li>
+                <li><strong>Cultural Nodes AI</strong> — Platform AI untuk mendukung kolaborasi, pembelajaran, dan pengelolaan pengetahuan komunitas akademik.</li>
+              </ul>
+
+              <div class="exp-subhead">Proyek Blockchain &amp; Web3</div>
+              <ul class="bullet-list">
+                <li><strong>Web3Radio</strong> — Platform radio terdesentralisasi berbasis Web3.</li>
+                <li><strong>Terminus Protocol</strong> — Sistem Proof of Attendance dan Proof of Presence berbasis blockchain.</li>
+                <li><strong>History Makers</strong> — Marketplace untuk tokenisasi Real-World Assets (RWA).</li>
+                <li><strong>FarmDAO</strong> — Platform tokenisasi aset pertanian dan kolaborasi berbasis DAO.</li>
+                <li><strong>Sched3</strong> — Aplikasi penjadwalan terdesentralisasi.</li>
+              </ul>
+
+              <div class="exp-subhead">Selected Web &amp; Enterprise Projects</div>
+              <ul class="bullet-list">
+                <li>Website perusahaan untuk PT Cahaya Pengajaran Abadi, AFF Advisory, PT CRA, PT CAL, Global Mitra Kencana, Adhere.id, GIC Indonesia, ITC Indonesia, dan berbagai organisasi lainnya.</li>
+                <li>Pengembangan aplikasi Inventory Management dan Asset Management berbasis web.</li>
+                <li>Website institusi pendidikan, UMKM, media, komunitas, serta organisasi non-profit.</li>
+              </ul>
+
+              <div class="exp-subhead">Creative &amp; Digital Project Management</div>
+              <ul class="bullet-list">
+                <li>Mengelola pengembangan platform digital dan media untuk Mekaway Studio &amp; Production House, Kawan Pencerita, Erza Indriyani, Erwin Sulaiman serta DiRumahja Podcast.</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+      </div>
+
+      <!-- Right Sidebar -->
+      <aside class="sidebar">
+        <section class="side-card">
+          <h3 class="side-title">~/Skill</h3>
+          <div class="skill-stack">
+            <div class="skill-item">Programming &amp; Web Development</div>
+            <div class="skill-item">Artificial Intelligence</div>
+            <div class="skill-item">Blockchain &amp; Web3</div>
+            <div class="skill-item">IT Infrastructure</div>
+            <div class="skill-item">Community Building &amp; Developer Relations</div>
+            <div class="skill-item">Technology Evangelism &amp; Technical Presentation</div>
+          </div>
+        </section>
+
+        <section class="side-card">
+          <h3 class="side-title">~/education_history</h3>
+          <div class="edu-school">Universitas Hasanuddin</div>
+          <div class="edu-detail">
+            French Literature<br>
+            2006
+          </div>
+        </section>
+
+        <section class="side-card">
+          <h3 class="side-title">~/language_options</h3>
+          <ul class="lang-list">
+            <li>English (Fluent)</li>
+            <li>French (Basic)</li>
+          </ul>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+</body>
+</html>
